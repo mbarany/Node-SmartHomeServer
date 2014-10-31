@@ -10,5 +10,6 @@ var app = new App(_.clone(config));
 try {
 	app.execute.apply(app, args);
 } catch (e) {
+	console.log('');
 	console.log(e);
 }

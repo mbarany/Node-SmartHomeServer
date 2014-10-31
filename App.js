@@ -4,14 +4,17 @@ var later = require('later');
 
 var VeraApi = require("./vera/Api");
 var VeraSwitch = require("./vera/Switch");
+var VeraThermostat = require("./vera/Thermostat");
+var VeraScene = require("./vera/Scene");
 var Schedule = require('./Schedule');
 
 
 var App = function (config) {
 	this.config = config;
 	this.api = new VeraApi(config.vera.api);
-	this.switches = _loadSwitches.call(this);
-	this.schedule = new Schedule(this.switches, config.location);
+	this.devices = _loadDevices.call(this);
+	this.scenes = _loadScenes.call(this);
+	this.schedule = new Schedule(this.devices, this.scenes, config.location);
 };
 
 var ACTIONS = {
@@ -19,13 +22,25 @@ var ACTIONS = {
 	SERVER: '--server',
 };
 
-function _loadSwitches() {
+function _loadDevices() {
 	var _this = this;
-	var switches = {};
-	_(this.config.vera.devices).each(function (value, key) {
-		switches[key] = new VeraSwitch(_this.api, value);
+	var devices = {};
+	_(this.config.vera.switches).each(function (value) {
+		devices[value] = new VeraSwitch(_this.api, value);
 	});
-	return switches;
+	_(this.config.vera.thermostats).each(function (value) {
+		devices[value] = new VeraThermostat(_this.api, value);
+	});
+	return devices;
+}
+
+function _loadScenes() {
+	var _this = this;
+	var scenes = {};
+	_(this.config.vera.scenes).each(function (value) {
+		scenes[value] = new VeraScene(_this.api, value);
+	});
+	return scenes;
 }
 
 function _setupSchedule() {
@@ -76,7 +91,7 @@ App.prototype.execute = function () {
 };
 
 App.prototype.validateDevice = function (device) {
-	if (device && this.switches[device]) {
+	if (device && this.config.vera.switches[device]) {
 		return device;
 	}
 };
@@ -90,14 +105,12 @@ App.prototype.printUsage = function () {
 	console.log('  Turn den light off: node index.js den off');
 };
 
-App.prototype.executeSwitch = function (device, state) {
-	if (!this.switches[device]) {
-		throw new Error('No device found by the name "' + device + '"!');
+App.prototype.executeSwitch = function (deviceName, state) {
+	if (!this.validateDevice(deviceName)) {
+		throw new Error('No device found by the name "' + deviceName + '"!');
 	}
-	if (!_.isFunction(this.switches[device][state])) {
-		throw new Error('Device does not have the state "' + state + '"!');
-	}
-	this.switches[device][state]();
+	var device = this.devices[this.config.vera.switches[deviceName]];
+	device.setState(state);
 };
 
 App.prototype.startServer = function () {
