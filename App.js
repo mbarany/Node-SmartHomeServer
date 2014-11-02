@@ -19,6 +19,7 @@ var App = function (config) {
 
 var ACTIONS = {
 	HELP: '--help',
+	LIST: '--list',
 	SERVER: '--server',
 };
 
@@ -67,11 +68,30 @@ function _getActionAndArgs(args) {
 	return actionAndArgs;
 }
 
+function _getDeviceIdFromName(device) {
+	if (!device) {
+		return;
+	}
+	if (this.config.vera.switches[device]) {
+		return this.config.vera.switches[device];
+	}
+	if (this.config.vera.thermostats[device]) {
+		return this.config.vera.thermostats[device];
+	}
+};
+
+function _getSceneIdFromName(sceneName) {
+	if (sceneName && this.config.vera.scenes[sceneName]) {
+		return this.config.vera.scenes[sceneName];
+	}
+}
+
 App.prototype.execute = function () {
 	var actionAndArgs = _getActionAndArgs(arguments);
 	var args = actionAndArgs.args;
-	var device = this.validateDevice(args[0]);
-	var state = args[1] || 'on';
+	var deviceId = _getDeviceIdFromName.apply(this, [args[0]]);
+	var sceneId = _getSceneIdFromName.apply(this, [args[0]]);
+	var state = args[1];
 
 	switch (actionAndArgs.action) {
 		case ACTIONS.SERVER:
@@ -80,9 +100,14 @@ App.prototype.execute = function () {
 		case ACTIONS.HELP:
 			this.printUsage();
 			break;
+		case ACTIONS.LIST:
+			this.printDeviceList();
+			break;
 		default:
-			if (device) {
-				this.executeSwitch(device, state);
+			if (deviceId && state) {
+				this.executeDevice(deviceId, state);
+			} else if (sceneId) {
+				this.executeScene(sceneId);
 			} else {
 				this.printUsage();
 			}
@@ -90,27 +115,42 @@ App.prototype.execute = function () {
 	}
 };
 
-App.prototype.validateDevice = function (device) {
-	if (device && this.config.vera.switches[device]) {
-		return device;
-	}
-};
-
 App.prototype.printUsage = function () {
 	console.log('Usage:'.underline.bold);
-	console.log('  Displays this help screen: node index.js --help');
-	console.log('  Starts the schedule server:  node index.js --server');
-	console.log('  Changes the state on a switch:  node index.js [device] [state]');
+	console.log('  Display this help screen: ' + 'node index.js --help'.yellow);
+	console.log('  Start the schedule server: ' + 'node index.js --server'.yellow);
+	console.log('  List all devices and scenes: ' + 'node index.js --list'.yellow);
+	console.log('  Change the state of a device: ' + 'node index.js [device] [state]'.yellow);
+	console.log('  Execute a scene: ' + 'node index.js [scene]'.yellow);
 	console.log('Examples:'.underline.bold);
-	console.log('  Turn den light off: node index.js den off');
+	console.log('  Turn den light off: ' + 'node index.js den off'.yellow);
+	console.log('  Change main thermostat temperature: ' + 'node index.js main 70'.yellow);
+	console.log('  Turn on all lights: ' + 'node index.js all_lights_on'.yellow);
 };
 
-App.prototype.executeSwitch = function (deviceName, state) {
-	if (!this.validateDevice(deviceName)) {
-		throw new Error('No device found by the name "' + deviceName + '"!');
-	}
-	var device = this.devices[this.config.vera.switches[deviceName]];
+App.prototype.printDeviceList = function () {
+	console.log('Switches:'.underline.bold);
+	_(this.config.vera.switches).each(function (value, key) {
+		console.log('  ' + key);
+	});
+	console.log('Thermostats:'.underline.bold);
+	_(this.config.vera.thermostats).each(function (value, key) {
+		console.log('  ' + key);
+	});
+	console.log('Scenes:'.underline.bold);
+	_(this.config.vera.scenes).each(function (value, key) {
+		console.log('  ' + key);
+	});
+};
+
+App.prototype.executeDevice = function (deviceId, state) {
+	var device = this.devices[deviceId];
 	device.setState(state);
+};
+
+App.prototype.executeScene = function (sceneId) {
+	var scene = this.scenes[sceneId];
+	scene.run();
 };
 
 App.prototype.startServer = function () {
