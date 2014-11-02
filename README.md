@@ -8,7 +8,7 @@ Setup
 =====
 - Copy `config/config.sample.js` to `config/config.js` and modify accordingly.
 - `npm install`
-- `node index.js help` for usage
+- `node index.js --help` for usage
 
 
 License
