@@ -122,7 +122,7 @@ Schedule.prototype.run = function (schedule) {
 	var m = moment().startOf('week');
 	var days = 7;
 
-	if (!schedule || schedule.weekly || !schedule.weekly.length) {
+	if (!schedule || !schedule.weekly || !schedule.weekly.length) {
 		throw new Error('Empty Schedule!');
 	}
 	_d(m.toDate(), days - 1).each(function (d) {

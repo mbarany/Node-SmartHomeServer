@@ -89,8 +89,8 @@ function _getSceneIdFromName(sceneName) {
 App.prototype.execute = function () {
 	var actionAndArgs = _getActionAndArgs(arguments);
 	var args = actionAndArgs.args;
-	var deviceId = _getDeviceIdFromName.apply(this, [args[0]]);
-	var sceneId = _getSceneIdFromName.apply(this, [args[0]]);
+	var deviceId = _getDeviceIdFromName.call(this, args[0]);
+	var sceneId = _getSceneIdFromName.call(this, args[0]);
 	var state = args[1];
 
 	switch (actionAndArgs.action) {
