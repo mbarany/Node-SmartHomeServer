@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var colors = require('colors');
 var later = require('later');
 var SunCalc = require('suncalc');
 var moment = require('moment');
@@ -6,10 +7,12 @@ var moment = require('moment');
 var _d = require('./date-helper');
 
 
-var Schedule = function (devices, scenes, opts) {
+var Schedule = function (devices, scenes, rawSchedule, opts) {
 	this.devices = devices;
 	this.scenes = scenes;
+	this.rawSchedule = rawSchedule;
 	this.opts = opts || {};
+	this._schedules = [];
 	this._timers = [];
 	return this;
 };
@@ -45,7 +48,7 @@ function _getTimes(date) {
 	var m = moment(date);
 	m.set('hour', 12); //hack: set to mid-day to get correct times
 	return SunCalc.getTimes(m.toDate(), this.getLat(), this.getLon());
-};
+}
 
 function _getDateFromType(m, type) {
 	switch (type) {
@@ -65,7 +68,7 @@ function _getScene(sceneId) {
 		throw new Error('Scene not found with id "' + sceneId + '"!');
 	}
 	return this.scenes[sceneId];
-};
+}
 
 function _getDevice(deviceId) {
 	if (!this.devices[deviceId]) {
@@ -74,14 +77,51 @@ function _getDevice(deviceId) {
 	return this.devices[deviceId];
 };
 
+function _setupSchedule() {
+	var _this = this;
+	var schedule = this.rawSchedule;
+	var m = moment().startOf('week');
+	var days = 7;
+
+	if (!schedule || !schedule.weekly || !schedule.weekly.length) {
+		throw new Error('Empty Schedule!');
+	}
+	_d(m.toDate(), days - 1).each(function (d) {
+		var m = moment(d);
+		_(schedule.weekly).each(function (w) {
+			var daysToIterate = w.days && w.days.length ? w.days : ALL_DAYS;
+			_(daysToIterate).each(function (day) {
+				if (day !== m.day() + 1) {
+					return;
+				}
+
+				var scheduleDate = _getDateFromType.call(_this, m, w.type);
+				var sequence = _convertToSequence.call(_this, w);
+				_setupScheduleSequence.call(_this, scheduleDate, sequence);
+			});
+		});
+	});
+};
+
 function _setupScheduleSequence(scheduleDate, sequence) {
 	var _this = this;
 	_(sequence).each(function (s) {
 		scheduleDate.add(s.at, 'minutes');
 		var sched = _convertMomentToSchedule(scheduleDate);
+		_this._schedules.push({
+			schedule: sched,
+			scenes: s.scenes,
+			devices: s.devices,
+		});
+	});
+}
+
+function _setupTimers() {
+	var _this = this;
+	_(this._schedules).each(function (s) {
 		_this._timers.push(later.setTimeout(function () {
 			_(s.scenes).each(function (sceneId) {
-				var scene = _getScene.apply(_this, [sceneId]);
+				var scene = _getScene.call(_this, sceneId);
 				scene.run();
 			});
 			_(s.devices).each(function (device) {
@@ -90,10 +130,36 @@ function _setupScheduleSequence(scheduleDate, sequence) {
 				}
 				var deviceId = device[0];
 				var state = device[1];
-				var d = _getDevice.apply(_this, [deviceId]);
+				var d = _getDevice.call(_this, deviceId);
 				d.setState(state);
 			});
-		}, sched));
+		}, s.schedule));
+	});
+}
+
+function _printSchedule() {
+	var _this = this;
+	_(this._schedules).each(function (s) {
+		var scenes = _(s.scenes).map(function (sceneId) {
+			var scene = _getScene.call(_this, sceneId);
+			return scene.getName();
+		});
+		var devices = _(s.devices).map(function (device) {
+			var deviceId = device[0];
+			var state = device[1];
+			var d = _getDevice.call(_this, deviceId);
+			return d.getName() + '(' + state + ')';
+		});
+
+		console.log(later.schedule(s.schedule).next(1).toString().bold.underline);
+		if (scenes.length) {
+			console.log('  Scenes: ' + scenes.join(', '));
+		}
+		if (devices.length) {
+			console.log('  Devices:');
+			console.log('    ' + devices.join(', '));
+		}
+		console.log('');
 	});
 }
 
@@ -117,29 +183,14 @@ Schedule.prototype.getLon = function () {
 	return this.opts.lon;
 };
 
-Schedule.prototype.run = function (schedule) {
-	var _this = this;
-	var m = moment().startOf('week');
-	var days = 7;
+Schedule.prototype.preview = function () {
+	_setupSchedule.call(this);
+	_printSchedule.call(this);
+};
 
-	if (!schedule || !schedule.weekly || !schedule.weekly.length) {
-		throw new Error('Empty Schedule!');
-	}
-	_d(m.toDate(), days - 1).each(function (d) {
-		var m = moment(d);
-		_(schedule.weekly).each(function (w) {
-			var daysToIterate = w.days && w.days.length ? w.days : ALL_DAYS;
-			_(daysToIterate).each(function (day) {
-				if (day !== m.day() + 1) {
-					return;
-				}
-
-				var scheduleDate = _getDateFromType.apply(_this, [m, w.type]);
-				var sequence = _convertToSequence.apply(_this, [w]);
-				_setupScheduleSequence.apply(_this, [scheduleDate, sequence]);
-			});
-		});
-	});
+Schedule.prototype.run = function () {
+	_setupSchedule.call(this);
+	_setupTimers.call(this);
 };
 
 Schedule.prototype.clearTimers = function () {

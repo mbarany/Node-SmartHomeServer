@@ -14,23 +14,24 @@ var App = function (config) {
 	this.api = new VeraApi(config.vera.api);
 	this.devices = _loadDevices.call(this);
 	this.scenes = _loadScenes.call(this);
-	this.schedule = new Schedule(this.devices, this.scenes, config.location);
+	this.schedule = new Schedule(this.devices, this.scenes, config.schedule, config.location);
 };
 
 var ACTIONS = {
 	HELP: '--help',
 	LIST: '--list',
 	SERVER: '--server',
+	PREVIEW: '--preview',
 };
 
 function _loadDevices() {
 	var _this = this;
 	var devices = {};
-	_(this.config.vera.switches).each(function (value) {
-		devices[value] = new VeraSwitch(_this.api, value);
+	_(this.config.vera.switches).each(function (value, key) {
+		devices[value] = new VeraSwitch(_this.api, value, key);
 	});
-	_(this.config.vera.thermostats).each(function (value) {
-		devices[value] = new VeraThermostat(_this.api, value);
+	_(this.config.vera.thermostats).each(function (value, key) {
+		devices[value] = new VeraThermostat(_this.api, value, key);
 	});
 	return devices;
 }
@@ -38,8 +39,8 @@ function _loadDevices() {
 function _loadScenes() {
 	var _this = this;
 	var scenes = {};
-	_(this.config.vera.scenes).each(function (value) {
-		scenes[value] = new VeraScene(_this.api, value);
+	_(this.config.vera.scenes).each(function (value, key) {
+		scenes[value] = new VeraScene(_this.api, value, key);
 	});
 	return scenes;
 }
@@ -50,7 +51,7 @@ function _setupSchedule() {
 	process.stdout.write('Done.' + "\n");
 
 	process.stdout.write('Setting up new schedule...');
-	this.schedule.run(this.config.schedule);
+	this.schedule.run();
 	process.stdout.write('Done.' + "\n");
 }
 
@@ -96,6 +97,9 @@ App.prototype.execute = function () {
 	switch (actionAndArgs.action) {
 		case ACTIONS.SERVER:
 			this.startServer();
+			break;
+		case ACTIONS.PREVIEW:
+			this.previewSchedule();
 			break;
 		case ACTIONS.HELP:
 			this.printUsage();
@@ -161,6 +165,10 @@ App.prototype.startServer = function () {
 	later.setInterval(function () {
 		_setupSchedule.call(_this);
 	}, later.parse.cron('0 0 * * 0'));
+};
+
+App.prototype.previewSchedule = function () {
+	this.schedule.preview();
 };
 
 module.exports = App;

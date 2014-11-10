@@ -5,14 +5,19 @@ function _action(actionValue) {
 	}, 'RunScene');
 }
 
-var Scene = function (api, sceneId) {
+var Scene = function (api, sceneId, sceneName) {
 	this.api = api;
 	this.sceneId = sceneId;
+	this.sceneName = sceneName;
 	return this;
 };
 
 Scene.prototype.getId = function () {
 	return this.sceneId;
+};
+
+Scene.prototype.getName = function () {
+	return this.sceneName;
 };
 
 Scene.prototype.run = function () {

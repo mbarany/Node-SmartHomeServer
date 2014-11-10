@@ -5,9 +5,10 @@ var ApiService = require('./ApiService');
 
 var AbstractDevice = function () {};
 
-AbstractDevice.prototype.initialize = function (api, deviceId) {
+AbstractDevice.prototype.initialize = function (api, deviceId, deviceName) {
 	this.api = api;
 	this.deviceId = deviceId;
+	this.deviceName = deviceName;
 	return this;
 };
 
@@ -26,6 +27,10 @@ AbstractDevice.prototype._action = function (service, actionValue) {
 
 AbstractDevice.prototype.getId = function () {
 	return this.deviceId;
+};
+
+AbstractDevice.prototype.getName = function () {
+	return this.deviceName;
 };
 
 AbstractDevice.prototype.setState = function (state) {
