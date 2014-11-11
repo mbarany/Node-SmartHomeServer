@@ -2,22 +2,24 @@ var _ = require('underscore');
 var colors = require('colors');
 var later = require('later');
 var SunCalc = require('suncalc');
-var moment = require('moment');
+var moment = require('moment-timezone');
 
 var _d = require('./date-helper');
 
 
-var Schedule = function (devices, scenes, rawSchedule, opts) {
+var Schedule = function (devices, scenes, rawSchedule, location) {
     this.devices = devices;
     this.scenes = scenes;
     this.rawSchedule = rawSchedule;
-    this.opts = opts || {};
+    this.location = location || {};
     this._schedules = [];
     this._timers = [];
     return this;
 };
 
 var ALL_DAYS = _.range(1, 8);
+var DEFAULT_TIMEZONE = 'America/New_York';
+var DATE_FORMAT = 'ddd, MMM D YYYY, hh:mm:ssa z';
 
 function _convertMomentToSchedule(m) {
     var d = new Date(m.toDate());
@@ -53,7 +55,7 @@ function _getTimes(date) {
 function _getDateFromType(m, type) {
     switch (type) {
         case Schedule.TYPES.EXACT:
-            return moment(m)
+            return moment(m);
         case Schedule.TYPES.SUNSET:
             return moment(_getTimes.apply(this, [m.toDate()]).sunset);
         case Schedule.TYPES.SUNRISE:
@@ -75,19 +77,18 @@ function _getDevice(deviceId) {
         throw new Error('Device not found with id "' + deviceId + '"!');
     }
     return this.devices[deviceId];
-};
+}
 
 function _setupSchedule() {
     var _this = this;
     var schedule = this.rawSchedule;
-    var m = moment().startOf('week');
-    var days = 7;
+    var m = moment().tz(this.getTimezone()).startOf('week');
 
     if (!schedule || !schedule.weekly || !schedule.weekly.length) {
         throw new Error('Empty Schedule!');
     }
-    _d(m.toDate(), days - 1).each(function (d) {
-        var m = moment(d);
+
+    for (var i = 0; i < 7; i++) {
         _(schedule.weekly).each(function (w) {
             var daysToIterate = w.days && w.days.length ? w.days : ALL_DAYS;
             _(daysToIterate).each(function (day) {
@@ -100,8 +101,9 @@ function _setupSchedule() {
                 _setupScheduleSequence.call(_this, scheduleDate, sequence);
             });
         });
-    });
-};
+        m.add(1, 'days');
+    }
+}
 
 function _setupScheduleSequence(scheduleDate, sequence) {
     var _this = this;
@@ -151,9 +153,12 @@ function _printSchedule() {
             return d.getName() + '(' + state + ')';
         });
 
-        console.log(later.schedule(s.schedule).next(1).toString().bold.underline);
+        var nextDate = later.schedule(s.schedule).next(1);
+        var nextMoment = moment.tz(nextDate, _this.getTimezone());
+        console.log(nextMoment.format(DATE_FORMAT).bold.underline);
         if (scenes.length) {
-            console.log('  Scenes: ' + scenes.join(', '));
+            console.log('  Scenes:');
+            console.log('    ' + scenes.join(', '));
         }
         if (devices.length) {
             console.log('  Devices:');
@@ -170,17 +175,21 @@ Schedule.TYPES = {
 };
 
 Schedule.prototype.getLat = function () {
-    if (!this.opts.lat) {
+    if (!this.location.lat) {
         throw new Error('lat not found!');
     }
-    return this.opts.lat;
+    return this.location.lat;
 };
 
 Schedule.prototype.getLon = function () {
-    if (!this.opts.lon) {
+    if (!this.location.lon) {
         throw new Error('lon not found!');
     }
-    return this.opts.lon;
+    return this.location.lon;
+};
+
+Schedule.prototype.getTimezone = function () {
+    return this.location.timezone || DEFAULT_TIMEZONE;
 };
 
 Schedule.prototype.preview = function () {

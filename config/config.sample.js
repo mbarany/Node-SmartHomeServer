@@ -21,9 +21,10 @@ var config = {
         thermostats: thermostats,
         scenes: scenes,
     },
-    location: { //Used for getting Sunrise/Sunset times
-        lat: 40.7056308,
-        lon: -73.9780035,
+    location: {
+        lat: 40.7056308, //Used for getting Sunrise/Sunset times
+        lon: -73.9780035, //Used for getting Sunrise/Sunset times
+        timezone: 'America/New_York', //Used for setting schedule
     },
     schedule: {
         weekly: [
