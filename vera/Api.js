@@ -3,37 +3,37 @@ var http = require("q-io/http");
 
 
 var defaultParams = {
-	id: 'lu_action',
-	output_format: 'json',
+    id: 'lu_action',
+    output_format: 'json',
 };
 
 var Api = function (config) {
-	this.config = config;
+    this.config = config;
 };
 
 Api.prototype.action = function (params, action) {
-	var allParams = _.extend({}, defaultParams, params);
-	var url = '';
-	var urlParts = [];
+    var allParams = _.extend({}, defaultParams, params);
+    var url = '';
+    var urlParts = [];
 
-	allParams.action = action;
+    allParams.action = action;
 
-	_(allParams).each(function (value, key) {
-		urlParts.push(key + '=' + value);
-	});
-	url = '?' + urlParts.join('&');
+    _(allParams).each(function (value, key) {
+        urlParts.push(key + '=' + value);
+    });
+    url = '?' + urlParts.join('&');
 
-	return http.request({
-		url: this.config.host + this.config.endpoint + url,
-		method: 'GET',
-	})
-	.then(function (res) {
-		console.log('API Status: ' + res.status);
-		return res.body.read();
-	})
-	.then(function (bodyBuffer) {
-		console.log('Body: ' + bodyBuffer.toString());
-	});
+    return http.request({
+        url: this.config.host + this.config.endpoint + url,
+        method: 'GET',
+    })
+    .then(function (res) {
+        console.log('API Status: ' + res.status);
+        return res.body.read();
+    })
+    .then(function (bodyBuffer) {
+        console.log('Body: ' + bodyBuffer.toString());
+    });
 }
 
 module.exports = Api;
