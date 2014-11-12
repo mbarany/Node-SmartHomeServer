@@ -11,20 +11,19 @@ var Schedule = function (devices, scenes, rawSchedule, location) {
     this.rawSchedule = rawSchedule;
     this.location = location || {};
     this._schedules = [];
-    this._timers = [];
     return this;
 };
 
 var ALL_DAYS = _.range(1, 8);
 var DEFAULT_TIMEZONE = 'America/New_York';
-var DATE_FORMAT = 'ddd, MMM D YYYY, hh:mm:ssa z';
+var DATE_FORMAT = 'llll z';
 
 function _convertMomentToSchedule(m) {
-    var d = new Date(m.toDate());
+    var d = m.clone().toDate();
     return later.parse.recur()
         .on(later.hour.val(d)).hour()
         .on(later.minute.val(d)).minute()
-        .on(later.dayOfYear.val(d)).dayOfYear();
+        .on(later.dayOfWeek.val(d)).dayOfWeek();
 }
 
 function _convertToSequence(weeklySchedule) {
@@ -44,20 +43,20 @@ function _convertToSequence(weeklySchedule) {
     return [sequence];
 }
 
-function _getTimes(date) {
-    var m = moment(date);
-    m.set('hour', 12); //hack: set to mid-day to get correct times
-    return SunCalc.getTimes(m.toDate(), this.getLat(), this.getLon());
+function _getTimes(m) {
+    var mm = m.clone();
+    mm.set('hour', 12); //hack: set to mid-day to get correct times
+    return SunCalc.getTimes(mm.toDate(), this.getLat(), this.getLon());
 }
 
 function _getDateFromType(m, type) {
     switch (type) {
         case Schedule.TYPES.EXACT:
-            return moment(m);
+            return m.clone();
         case Schedule.TYPES.SUNSET:
-            return moment(_getTimes.apply(this, [m.toDate()]).sunset);
+            return moment(_getTimes.call(this, m).sunset);
         case Schedule.TYPES.SUNRISE:
-            return moment(_getTimes.apply(this, [m.toDate()]).sunrise);
+            return moment(_getTimes.call(this, m).sunrise);
         default:
             throw new Error('Invalid type "' + type + '"!');
     }
@@ -80,7 +79,7 @@ function _getDevice(deviceId) {
 function _setupSchedule() {
     var _this = this;
     var schedule = this.rawSchedule;
-    var m = moment().tz(this.getTimezone()).startOf('week');
+    var m = this.getStartOfWeek();
 
     if (!schedule || !schedule.weekly || !schedule.weekly.length) {
         throw new Error('Empty Schedule!');
@@ -107,7 +106,7 @@ function _setupScheduleSequence(scheduleDate, sequence) {
     var _this = this;
     _(sequence).each(function (s) {
         scheduleDate.add(s.at, 'minutes');
-        var sched = _convertMomentToSchedule(scheduleDate);
+        var sched = _convertMomentToSchedule.call(_this, scheduleDate);
         _this._schedules.push({
             schedule: sched,
             scenes: s.scenes,
@@ -118,8 +117,16 @@ function _setupScheduleSequence(scheduleDate, sequence) {
 
 function _setupTimers() {
     var _this = this;
+    var startOfWeek = this.getStartOfWeek();
+    var nextDate;
+
     _(this._schedules).each(function (s) {
-        _this._timers.push(later.setTimeout(function () {
+        nextDate = later.schedule(s.schedule).next(1, startOfWeek);
+        if (moment().isAfter(nextDate)) {
+            return;
+        }
+
+        later.setTimeout(function () {
             _(s.scenes).each(function (sceneId) {
                 var scene = _getScene.call(_this, sceneId);
                 scene.run();
@@ -133,12 +140,17 @@ function _setupTimers() {
                 var d = _getDevice.call(_this, deviceId);
                 d.setState(state);
             });
-        }, s.schedule));
+        }, s.schedule);
     });
 }
 
 function _printSchedule() {
     var _this = this;
+    var startOfWeek = this.getStartOfWeek();
+    var scheduleStartDate = startOfWeek.toDate();
+    var title = startOfWeek.year() + ' schedule for Week #' + startOfWeek.week();
+
+    console.log(title.green.bold.underline, '\n');
     _(this._schedules).each(function (s) {
         var scenes = _(s.scenes).map(function (sceneId) {
             var scene = _getScene.call(_this, sceneId);
@@ -151,7 +163,7 @@ function _printSchedule() {
             return d.getName() + '(' + state + ')';
         });
 
-        var nextDate = later.schedule(s.schedule).next(1);
+        var nextDate = later.schedule(s.schedule).next(1, scheduleStartDate);
         var nextMoment = moment.tz(nextDate, _this.getTimezone());
         console.log(nextMoment.format(DATE_FORMAT).bold.underline);
         if (scenes.length) {
@@ -190,6 +202,10 @@ Schedule.prototype.getTimezone = function () {
     return this.location.timezone || DEFAULT_TIMEZONE;
 };
 
+Schedule.prototype.getStartOfWeek = function () {
+    return moment().tz(this.getTimezone()).startOf('week');
+};
+
 Schedule.prototype.preview = function () {
     _setupSchedule.call(this);
     _printSchedule.call(this);
@@ -198,13 +214,6 @@ Schedule.prototype.preview = function () {
 Schedule.prototype.run = function () {
     _setupSchedule.call(this);
     _setupTimers.call(this);
-};
-
-Schedule.prototype.clearTimers = function () {
-    _(this._timers).each(function (timer) {
-        timer.clear();
-    });
-    this._timers = [];
 };
 
 module.exports = Schedule;

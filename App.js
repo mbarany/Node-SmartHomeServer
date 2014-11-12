@@ -1,7 +1,8 @@
 var _ = require("underscore");
-var colors = require('colors');
 var later = require('later');
+var moment = require('moment-timezone');
 var log = require('./log');
+require('colors');
 
 var VeraApi = require("./vera/Api");
 var VeraSwitch = require("./vera/Switch");
@@ -47,11 +48,7 @@ function _loadScenes() {
 }
 
 function _setupSchedule() {
-    log.line('Clearing out old schedule...', true);
-    this.schedule.clearTimers();
-    log.line('Done.' + "\n");
-
-    log.line('Setting up new schedule...', true);
+    log.line('Setting up schedule...', true);
     this.schedule.run();
     log.line('Done.' + "\n");
 }
@@ -160,12 +157,17 @@ App.prototype.executeScene = function (sceneId) {
 
 App.prototype.startServer = function () {
     var _this = this;
+    var startOfWeek = this.schedule.getStartOfWeek().toDate();
+    var sched = later.parse.recur()
+        .on(later.dayOfWeek.val(startOfWeek)).dayOfWeek()
+        .on(later.hour.val(startOfWeek)).hour()
+        .on(later.minute.val(startOfWeek)).minute();
 
     _setupSchedule.call(this);
     // Run weekly
     later.setInterval(function () {
         _setupSchedule.call(_this);
-    }, later.parse.cron('0 0 * * 0'));
+    }, sched);
 };
 
 App.prototype.previewSchedule = function () {
