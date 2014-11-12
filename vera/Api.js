@@ -1,6 +1,8 @@
 var _ = require("underscore");
 var http = require("q-io/http");
 
+var log = require('../log');
+
 
 var defaultParams = {
     id: 'lu_action',
@@ -13,7 +15,7 @@ var Api = function (config) {
 
 Api.prototype.action = function (params, action) {
     var allParams = _.extend({}, defaultParams, params);
-    var url = '';
+    var url;
     var urlParts = [];
 
     allParams.action = action;
@@ -28,11 +30,11 @@ Api.prototype.action = function (params, action) {
         method: 'GET',
     })
     .then(function (res) {
-        console.log('API Status: ' + res.status);
+        log('API Status: ' + res.status);
         return res.body.read();
     })
     .then(function (bodyBuffer) {
-        console.log('Body: ' + bodyBuffer.toString());
+        log('Body: ' + bodyBuffer.toString());
     });
 }
 

@@ -1,6 +1,7 @@
 var _ = require("underscore");
 var colors = require('colors');
 var later = require('later');
+var log = require('./log');
 
 var VeraApi = require("./vera/Api");
 var VeraSwitch = require("./vera/Switch");
@@ -46,13 +47,13 @@ function _loadScenes() {
 }
 
 function _setupSchedule() {
-    process.stdout.write('Clearing out old schedule...');
+    log.line('Clearing out old schedule...', true);
     this.schedule.clearTimers();
-    process.stdout.write('Done.' + "\n");
+    log.line('Done.' + "\n");
 
-    process.stdout.write('Setting up new schedule...');
+    log.line('Setting up new schedule...', true);
     this.schedule.run();
-    process.stdout.write('Done.' + "\n");
+    log.line('Done.' + "\n");
 }
 
 function _getActionAndArgs(args) {

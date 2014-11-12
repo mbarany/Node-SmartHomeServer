@@ -1,10 +1,8 @@
 var _ = require('underscore');
-var colors = require('colors');
 var later = require('later');
 var SunCalc = require('suncalc');
 var moment = require('moment-timezone');
-
-var _d = require('./date-helper');
+require('colors');
 
 
 var Schedule = function (devices, scenes, rawSchedule, location) {
@@ -29,19 +27,19 @@ function _convertMomentToSchedule(m) {
         .on(later.dayOfYear.val(d)).dayOfYear();
 }
 
-function _convertToSequence(weeklyScedule) {
-    if (weeklyScedule.sequence) {
-        return weeklyScedule.sequence;
+function _convertToSequence(weeklySchedule) {
+    if (weeklySchedule.sequence) {
+        return weeklySchedule.sequence;
     }
 
     var sequence = {
-        at: weeklyScedule.at,
+        at: weeklySchedule.at,
     };
-    if (weeklyScedule.devices) {
-        sequence.devices = weeklyScedule.devices;
+    if (weeklySchedule.devices) {
+        sequence.devices = weeklySchedule.devices;
     }
-    if (weeklyScedule.scenes) {
-        sequence.scenes = weeklyScedule.scenes;
+    if (weeklySchedule.scenes) {
+        sequence.scenes = weeklySchedule.scenes;
     }
     return [sequence];
 }
