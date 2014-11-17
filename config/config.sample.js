@@ -21,6 +21,10 @@ var config = {
         thermostats: thermostats,
         scenes: scenes,
     },
+    api: {
+        accessTokens: ['fn38g7ghg93hg98rhg7gh3r7g73hg'],
+        port: 80,
+    },
     location: {
         lat: 40.7056308, //Used for getting Sunrise/Sunset times
         lon: -73.9780035, //Used for getting Sunrise/Sunset times

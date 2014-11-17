@@ -38,7 +38,7 @@ AbstractDevice.prototype.setState = function (state) {
         return this[state]();
     }
     num = parseInt(state, 10);
-    if (_.isNumber(num)) {
+    if (_.isNumber(num) && !isNaN(num)) {
         return this.setStateNumber(num);
     }
     throw new Error('Invalid state for "' + state + '"!');

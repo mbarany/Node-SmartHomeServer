@@ -1,15 +1,17 @@
 var _ = require("underscore");
-var log = require('./log');
 
+var log = require('./src/log');
+var Cli = require('./src/Cli');
+var App = require('./src/App');
 var config = require('./config/config');
-var App = require('./App');
 
 
 var args = _(process.argv).rest(2);
-var app = new App(_.clone(config));
+var app = new App(config);
+var cli = new Cli(app);
 
 try {
-    app.execute.apply(app, args);
+    cli.execute.apply(cli, args);
 } catch (e) {
     log('');
     log(e);

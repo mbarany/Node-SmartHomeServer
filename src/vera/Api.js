@@ -36,6 +36,6 @@ Api.prototype.action = function (params, action) {
     .then(function (bodyBuffer) {
         log('Body: ' + bodyBuffer.toString());
     });
-}
+};
 
 module.exports = Api;
