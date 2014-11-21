@@ -1,14 +1,88 @@
-Node-VeraSmartHomeServer
-========================
+# Node-VeraSmartHomeServer
+A small Node Server to interact with the Vera Smart Home system (http://getvera.com/).
 
-A small Node Server to interact with the Vera Smart Home system (http://getvera.com/)
+## Features:
+- Set device states via command line
+- Weekly schedules
+- Set schedules at exact times or relative to local sunrise/sunset times
+- All times are relative to the Timezone setting in the config file
+- Vera UI7 remote url support. Given your vera username/password the system will fetch a remote url session
+- API Server. When in server mode you can send RESTful API calls to control your vera system
+
+## Some scheduling examples:
+- Turn on the living room light every Tuesday and Thursday at 5pm
+- Set the main thermostat to 70 degrees every weekday at 8am
 
 
-Setup
-=====
-- Copy `config/config.sample.js` to `config/config.js` and modify accordingly.
+# Setup
+- Copy `config/config.sample.js` to `config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
 - `npm install`
 - `node index.js --help` for usage
+
+
+# Updating
+- Convenient update script that pulls in remote changes and installs any new dependencies `./bin/update`
+
+
+# Usage
+- Start the schedule and API Server: `node index.js --server`
+- List all available devices: `node index.js --list`
+- Change the state of a device: `node index.js [device] [state]`
+- Execute a scene: `node index.js [scene]`
+
+
+# API
+Set the port in `api.port` section of the config.
+Basic Authentication is used to authenticate API calls. Simply pass a valid pre-shared key that you have placed in the `api.accessTokens` section of the config as the username portion and leave the password blank.
+
+Example API Call:
+```
+curl -u "{accessToken}:" http://{ip-address}:{port}/api/devices
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 220
+Date: Fri, 21 Nov 2014 10:05:47 GMT
+Connection: keep-alive
+
+{
+  "switches": [
+    {
+      "id": "1",
+      "name": "Den Light"
+    },
+    {
+      "id": "2",
+      "name": "Outside Light"
+    },
+    {
+      "id": "3",
+      "name": "Master Bedroom"
+    }
+  ],
+  "dimmableSwitches": [
+    {
+      "id": "4",
+      "name": "Dining Room Light"
+    }
+  ],
+  "thermostats": [
+    {
+      "id": "5",
+      "name": "Thermostat"
+    }
+  ]
+}
+```
+
+## GET /api/devices
+Returns an array of all the devices on your vera system
+
+## POST /api/devices/{deviceId}/{state}
+Sets a new state given a device id
+
+## POST /api/scenes/{sceneId}
+Runs a scene given a scene id
 
 
 License
