@@ -21,6 +21,7 @@ function createServer (rootApp) {
     });
 
     server.listen(port);
+    log.line('[Listening on port ' + port + ']...');
 
     return server;
 }

@@ -26,6 +26,7 @@ var config = {
         scenes: scenes,
     },
     api: {
+        //disabled: true, // optionally disable web server
         accessTokens: [ // used for API authentication
             'fn38g7ghg93hg98rhg7gh3r7g73hg'
         ],

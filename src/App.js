@@ -73,6 +73,9 @@ App.prototype.startServer = function () {
         _setupSchedule.call(_this);
     }, sched);
 
+    if (this.config.api.disabled) {
+        return;
+    }
     log.line('Starting API Server...', true);
     webServer(this);
     log.line('Done.' + "\n");
