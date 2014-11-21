@@ -5,8 +5,8 @@ var moment = require('moment-timezone');
 require('colors');
 
 
-var Schedule = function (devices, scenes, rawSchedule, location) {
-    this.devices = devices;
+var Schedule = function (controller, scenes, rawSchedule, location) {
+    this.controller = controller;
     this.scenes = scenes;
     this.rawSchedule = rawSchedule;
     this.location = location || {};
@@ -70,10 +70,10 @@ function _getScene(sceneId) {
 }
 
 function _getDevice(deviceId) {
-    if (!this.devices[deviceId]) {
+    if (!this.controller.devices[deviceId]) {
         throw new Error('Device not found with id "' + deviceId + '"!');
     }
-    return this.devices[deviceId];
+    return this.controller.devices[deviceId];
 }
 
 function _setupSchedule() {

@@ -28,18 +28,6 @@ function _getActionAndArgs(args) {
     return actionAndArgs;
 }
 
-function _getDeviceIdFromName(device) {
-    if (!device) {
-        return;
-    }
-    if (this.config.vera.switches[device]) {
-        return this.config.vera.switches[device];
-    }
-    if (this.config.vera.thermostats[device]) {
-        return this.config.vera.thermostats[device];
-    }
-}
-
 function _getSceneIdFromName(sceneName) {
     if (sceneName && this.config.vera.scenes[sceneName]) {
         return this.config.vera.scenes[sceneName];
@@ -49,7 +37,7 @@ function _getSceneIdFromName(sceneName) {
 Cli.prototype.execute = function () {
     var actionAndArgs = _getActionAndArgs(arguments);
     var args = actionAndArgs.args;
-    var deviceId = _getDeviceIdFromName.call(this, args[0]);
+    var deviceId = args[0];
     var sceneId = _getSceneIdFromName.call(this, args[0]);
     var state = args[1];
 
@@ -92,16 +80,22 @@ Cli.prototype.printUsage = function () {
 };
 
 Cli.prototype.printDeviceList = function () {
-    var printer = function (value, key) {
-        console.log('  ' + key + ' (' + value + ')');
+    var printer = function (device) {
+        console.log('  ' + device.name + ' (' + device.id + ')');
     };
+    var categorizedDevices = this.app.controller.getCategorizedDevices();
 
-    console.log('Switches:'.underline.bold);
-    _(this.config.vera.switches).each(printer);
+    console.log('On/Off Switches:'.underline.bold);
+    _(categorizedDevices.switches).each(printer);
+    console.log('Dimmable Switches:'.underline.bold);
+    _(categorizedDevices.dimmableSwitches).each(printer);
     console.log('Thermostats:'.underline.bold);
-    _(this.config.vera.thermostats).each(printer);
+    _(categorizedDevices.thermostats).each(printer);
+    //@todo get Scenes from API
     console.log('Scenes:'.underline.bold);
-    _(this.config.vera.scenes).each(printer);
+    _(this.config.vera.scenes).each(function (value, key) {
+        console.log('  ' + key + ' (' + value + ')');
+    });
 };
 
 module.exports = Cli;

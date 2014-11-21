@@ -3,31 +3,20 @@ var later = require('later');
 
 var log = require('./log');
 var VeraApi = require("./vera/Api");
-var VeraSwitch = require("./vera/Switch");
-var VeraThermostat = require("./vera/Thermostat");
+var VeraController = require('./vera/Controller');
 var VeraScene = require("./vera/Scene");
 var Schedule = require('./Schedule');
+var webServer = require('./web/server');
 
 
-var App = function (config) {
+var App = function (config, cache) {
     this.config = config;
-    this.api = new VeraApi(config.vera.api);
-    this.devices = _loadDevices.call(this);
+    this.cache = cache;
+    this.api = new VeraApi(config.vera.api, this.cache);
     this.scenes = _loadScenes.call(this);
-    this.schedule = new Schedule(this.devices, this.scenes, config.schedule, config.location);
+    this.controller = new VeraController(this.api, this.cache);
+    this.schedule = new Schedule(this.controller, this.scenes, config.schedule, config.location);
 };
-
-function _loadDevices() {
-    var _this = this;
-    var devices = {};
-    _(this.config.vera.switches).each(function (value, key) {
-        devices[value] = new VeraSwitch(_this.api, value, key);
-    });
-    _(this.config.vera.thermostats).each(function (value, key) {
-        devices[value] = new VeraThermostat(_this.api, value, key);
-    });
-    return devices;
-}
 
 function _loadScenes() {
     var _this = this;
@@ -44,8 +33,17 @@ function _setupSchedule() {
     log.line('Done.' + "\n");
 }
 
+App.prototype.load = function () {
+    var _this = this;
+
+    return this.api.load()
+        .then(function () {
+            return _this.controller.load();
+        });
+};
+
 App.prototype.executeDevice = function (deviceId, state) {
-    var device = this.devices[deviceId];
+    var device = this.controller.devices[deviceId];
     if (!device) {
         throw new Error('Invalid device id!');
     }
@@ -75,7 +73,7 @@ App.prototype.startServer = function () {
     }, sched);
 
     log.line('Starting API Server...', true);
-    require('./web/server')(this);
+    webServer(this);
     log.line('Done.' + "\n");
 };
 

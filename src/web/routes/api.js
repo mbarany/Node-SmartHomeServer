@@ -24,19 +24,31 @@ router.use(function(req, res, next) {
     }
 });
 
-router.post('/device/:deviceId/:newState', function (req, res) {
+router.get('/devices', function (req, res) {
+    res.send(app.controller.getCategorizedDevices());
+});
+
+router.post('/devices/:deviceId/:newState', function (req, res) {
     var deviceId = req.params.deviceId;
     var newState = req.params.newState;
 
-    app.executeDevice(deviceId, newState);
-    res.send('Done.');
+    try {
+        app.executeDevice(deviceId, newState);
+        res.send();
+    } catch (err) {
+        res.send({ error: err.message });
+    }
 });
 
-router.post('/scene/:sceneId', function (req, res) {
+router.post('/scenes/:sceneId', function (req, res) {
     var sceneId = req.params.sceneId;
 
-    app.executeScene(sceneId);
-    res.send('Done.');
+    try {
+        app.executeScene(sceneId);
+        res.send();
+    } catch (err) {
+        res.send({ error: err.message });
+    }
 });
 
 module.exports = function (rootApp) {

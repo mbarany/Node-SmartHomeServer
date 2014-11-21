@@ -14,15 +14,21 @@ var scenes = { //This is the scene id in the Vera system
 var config = {
     vera: {
         api: {
-            host: 'http://192.168.1.X',
-            endpoint: '/port_3480/data_request',
+            url: 'http://192.168.1.X/port_3480/data_request',
+            useRemote: true, // whether the remoteUrl should be used or not
+            remoteUrl: 'https://vera-us-oem-relay41.mios.com/relay/relay/relay/device/{{unitId}}/session/{{session}}/port_3480/data_request',
+            // vera unit id (aka serial number)
+            unitId: '123456',
+            // home.getvera.com credentials
+            username: 'bob',
+            password: 'pa$$word1',
         },
-        switches: switches,
-        thermostats: thermostats,
         scenes: scenes,
     },
     api: {
-        accessTokens: ['fn38g7ghg93hg98rhg7gh3r7g73hg'],
+        accessTokens: [ // used for API authentication
+            'fn38g7ghg93hg98rhg7gh3r7g73hg'
+        ],
         port: 80,
     },
     location: {

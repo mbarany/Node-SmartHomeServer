@@ -1,18 +1,19 @@
 var _ = require("underscore");
 
 var log = require('./src/log');
+var JsonCache = require('./src/JsonCache');
 var Cli = require('./src/Cli');
 var App = require('./src/App');
 var config = require('./config/config');
 
 
 var args = _(process.argv).rest(2);
-var app = new App(config);
+var cache = new JsonCache('./cache/');
+var app = new App(config, cache);
 var cli = new Cli(app);
 
-try {
+app.load().then(function () {
     cli.execute.apply(cli, args);
-} catch (e) {
-    log('');
-    log(e);
-}
+}).fail(function (err) {
+    log(err);
+});

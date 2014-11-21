@@ -10,11 +10,6 @@ var SERVICES = {
         'SetTarget',
         'newTargetValue'
     ),
-    DIMMER: new ApiService(
-        'urn:upnp-org:serviceId:Dimming1',
-        'SetLoadLevelTarget',
-        'newLoadlevelTarget'
-    ),
 };
 
 var Switch = function () {
@@ -31,16 +26,7 @@ Switch.prototype.off = function () {
 };
 
 Switch.prototype.setStateNumber = function (value) {
-    return this.dim(value);
-};
-
-Switch.prototype.dim = function (value) {
-    var validRange = _.range(0, 101);
-    value = parseInt(value, 10);
-    if (!_(validRange).contains(value)) {
-        throw new Error('Invalid dim value for "' + value + '"!');
-    }
-    return this._action(SERVICES.DIMMER, value);
+    throw new Error('Invalid state for value "' + value + '"!');
 };
 
 module.exports = Switch;

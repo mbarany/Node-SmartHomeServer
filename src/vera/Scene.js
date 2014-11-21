@@ -1,4 +1,4 @@
-function _action(actionValue) {
+function _action() {
     return this.api.action({
         serviceId: 'urn:micasaverde-com:serviceId:HomeAutomationGateway1',
         SceneNum: this.getId(),
