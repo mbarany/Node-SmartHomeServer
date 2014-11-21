@@ -9,10 +9,11 @@ var Schedule = require('./Schedule');
 var webServer = require('./web/server');
 
 
-var App = function (config, cache) {
+var App = function (config, appDir, cache) {
     this.config = config;
+    this.appDir = appDir;
     this.cache = cache;
-    this.api = new VeraApi(config.vera.api, this.cache);
+    this.api = new VeraApi(config.vera.api, this.appDir, this.cache);
     this.scenes = _loadScenes.call(this);
     this.controller = new VeraController(this.api, this.cache);
     this.schedule = new Schedule(this.controller, this.scenes, config.schedule, config.location);

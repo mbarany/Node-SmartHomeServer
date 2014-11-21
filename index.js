@@ -7,9 +7,10 @@ var App = require('./src/App');
 var config = require('./config/config');
 
 
+var appDir = require('path').dirname(require.main.filename) + '/';
 var args = _(process.argv).rest(2);
-var cache = new JsonCache('./cache/');
-var app = new App(config, cache);
+var cache = new JsonCache(appDir + 'cache/');
+var app = new App(config, appDir, cache);
 var cli = new Cli(app);
 
 app.load().then(function () {

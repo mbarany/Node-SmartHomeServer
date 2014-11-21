@@ -13,8 +13,9 @@ var defaultParams = {
     output_format: 'json',
 };
 
-var Api = function (config, cache) {
+var Api = function (config, appDir, cache) {
     this.config = config;
+    this.appDir = appDir;
     this.cache = cache;
 };
 
@@ -118,8 +119,8 @@ function _loadRemoteUrlFromApi() {
 function _wrapBadSSLChain(options) {
     var defaultOpts = {
         ca: [
-            fs.readFileSync('certs/gd-class2-root.crt'),
-            fs.readFileSync('certs/gd_intermediate.crt')
+            fs.readFileSync(this.appDir + 'certs/gd-class2-root.crt'),
+            fs.readFileSync(this.appDir + 'certs/gd_intermediate.crt')
         ]
     };
     var opts = _.extend({}, defaultOpts, options);
