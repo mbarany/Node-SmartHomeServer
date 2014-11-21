@@ -30,7 +30,17 @@ var config = {
         accessTokens: [ // used for API authentication
             'fn38g7ghg93hg98rhg7gh3r7g73hg'
         ],
-        port: 80,
+        port: 443,
+        // The following options are optional for SSL protection
+        isSecure: true,
+        key: 'local/server.key',
+        cert: 'local/server.cert',
+        // A CA bundle usually contains multiple certificate.
+        // They need to be in their own file here.
+        caBundle: [
+            'local/ca_intermediate1.cert',
+            'local/ca_intermediate2.cert',
+        ]
     },
     location: {
         lat: 40.7056308, //Used for getting Sunrise/Sunset times

@@ -3,4 +3,5 @@ config/config.js
 .DS_Store
 .idea
 cache/*
+local/*
 !.gitkeep
