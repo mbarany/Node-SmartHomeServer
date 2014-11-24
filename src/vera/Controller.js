@@ -9,6 +9,7 @@ var Thermostat = require('./Thermostat');
 var Controller = function (api, cache) {
     this.api = api;
     this.cache = cache;
+    this.clearDeviceCache = false;
     this.config = api.config;
     this.deviceData = [];
     this.devices = {};
@@ -27,8 +28,10 @@ var DEVICE_TYPE = {
 
 function _loadDevices() {
     var _this = this;
+    var cacheTime = this.clearDeviceCache ? 0 : 30 * 60;
 
-    return this.cache.get(CACHE_DEVICES, 30 * 60)
+    this.clearDeviceCache = false;
+    return this.cache.get(CACHE_DEVICES, cacheTime)
         .then(function (data) {
             log('Using devices cache...');
             _this.deviceData = data;
@@ -59,6 +62,7 @@ function _loadDevicesFromApi() {
                     id: device.id,
                     name: device.name,
                     deviceType: device.device_type,
+                    states: device.states,
                 };
             });
         });
@@ -69,7 +73,7 @@ function _createDeviceInstances() {
 
     _(this.deviceData).each(function (device) {
         var clazz = _getDeviceClass.call(this, device.deviceType);
-        _this.devices[device.id] = new clazz(_this.api, device.id, device.name);
+        _this.devices[device.id] = new clazz(_this.api, device);
     });
 }
 
@@ -86,11 +90,7 @@ function _getDeviceClass(deviceType) {
     }
 }
 
-Controller.prototype.load = function () {
-    return _loadDevices.call(this);
-};
-
-Controller.prototype.getCategorizedDevices = function () {
+function _getCategorizedDevices() {
     var categorizedDevices = {
         switches: [],
         dimmableSwitches: [],
@@ -101,6 +101,7 @@ Controller.prototype.getCategorizedDevices = function () {
         var data = {
             id: device.getId(),
             name: device.getName(),
+            status: device.getStatus(),
         };
 
         if (device instanceof Switch) {
@@ -114,6 +115,19 @@ Controller.prototype.getCategorizedDevices = function () {
         }
     });
     return categorizedDevices;
+}
+
+Controller.prototype.load = function () {
+    return _loadDevices.call(this);
+};
+
+Controller.prototype.getCategorizedDevices = function () {
+    var _this = this;
+
+    this.clearDeviceCache = true;
+    return this.load().then(function () {
+        return _getCategorizedDevices.call(_this);
+    });
 };
 
 module.exports = Controller;

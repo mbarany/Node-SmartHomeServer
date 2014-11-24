@@ -162,7 +162,9 @@ function _paramsToQueryString(params) {
     return '?' + urlParts.join('&');
 }
 
-function _doRequest(url) {
+function _doRequest(allParams) {
+    var url = _paramsToQueryString.call(this, allParams);
+
     log('Url: ' + url);
     return http.request({
         url: _getUrl.call(this) + url,
@@ -185,22 +187,24 @@ Api.prototype.load = function () {
 };
 
 Api.prototype.action = function (params, action) {
+    var _this = this;
     var allParams = _.extend({}, defaultParams, params);
-    var url;
 
     allParams.action = action;
-    url = _paramsToQueryString.call(this, allParams);
-
-    return _doRequest.call(this, url);
+    return this.load().then(function () {
+        return _doRequest.call(_this, allParams);
+    });
 };
 
 Api.prototype.userData = function () {
+    var _this = this;
     var allParams = {
         id: 'user_data',
     };
-    var url = _paramsToQueryString.call(this, allParams);
 
-    return _doRequest.call(this, url);
+    return this.load().then(function () {
+        return _doRequest.call(_this, allParams);
+    });
 };
 
 module.exports = Api;

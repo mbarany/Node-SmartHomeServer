@@ -63,7 +63,7 @@ JsonCache.prototype.get = function (key, expirationInSeconds) {
             return _getModifiedTime.call(_this, filename);
         })
         .then(function (seconds) {
-            if (expirationInSeconds && seconds > expirationInSeconds) {
+            if (expirationInSeconds >= 0 && seconds > expirationInSeconds) {
                 throw new Error('Expired!');
             }
             return data;

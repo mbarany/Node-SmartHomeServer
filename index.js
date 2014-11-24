@@ -14,7 +14,7 @@ var app = new App(config, appDir, cache);
 var cli = new Cli(app);
 
 app.load().then(function () {
-    cli.execute.apply(cli, args);
+    return cli.execute.apply(cli, args);
 }).fail(function (err) {
     log(err);
 });

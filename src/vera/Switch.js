@@ -25,8 +25,20 @@ Switch.prototype.off = function () {
     return this._action(SERVICES.SWITCH, 0);
 };
 
+Switch.prototype.getStatus = function () {
+    return this.status ? 'On' : 'Off';
+};
+
 Switch.prototype.setStateNumber = function (value) {
     throw new Error('Invalid state for value "' + value + '"!');
+};
+
+Switch.prototype.parseStates = function (states) {
+    var state = _(states).where({
+        service: SERVICES.SWITCH.serviceId,
+        variable: 'Target'
+    })[0];
+    this.status = parseInt(state.value, 10);
 };
 
 module.exports = Switch;

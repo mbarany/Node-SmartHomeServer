@@ -5,7 +5,7 @@ var _ = require('underscore');
 
 var app;
 
-function validateUser (user) {
+function _validateUser (user) {
     var accessTokens = app.config.api.accessTokens || [];
 
     if (!user || !user.name || user.pass !== '') {
@@ -17,7 +17,7 @@ function validateUser (user) {
 router.use(function(req, res, next) {
     var user = auth(req);
 
-    if (validateUser(user)) {
+    if (_validateUser(user)) {
         next();
     } else {
         res.sendStatus(401);
@@ -25,19 +25,20 @@ router.use(function(req, res, next) {
 });
 
 router.get('/devices', function (req, res) {
-    res.send(app.controller.getCategorizedDevices());
+    app.controller.getCategorizedDevices().then(function (devices) {
+        res.send(devices);
+    });
 });
 
 router.post('/devices/:deviceId/:newState', function (req, res) {
     var deviceId = req.params.deviceId;
     var newState = req.params.newState;
 
-    try {
-        app.executeDevice(deviceId, newState);
+    app.executeDevice(deviceId, newState).then(function () {
         res.send();
-    } catch (err) {
+    }, function (err) {
         res.send({ error: err.message });
-    }
+    });
 });
 
 router.post('/scenes/:sceneId', function (req, res) {

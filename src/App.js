@@ -1,5 +1,6 @@
 var _ = require("underscore");
 var later = require('later');
+var Q = require('q');
 
 var log = require('./log');
 var VeraApi = require("./vera/Api");
@@ -35,20 +36,19 @@ function _setupSchedule() {
 }
 
 App.prototype.load = function () {
-    var _this = this;
-
-    return this.api.load()
-        .then(function () {
-            return _this.controller.load();
-        });
+    return Q();
 };
 
 App.prototype.executeDevice = function (deviceId, state) {
-    var device = this.controller.devices[deviceId];
-    if (!device) {
-        throw new Error('Invalid device id!');
-    }
-    device.setState(state);
+    var _this = this;
+
+    return this.controller.load().then(function () {
+        var device = _this.controller.devices[deviceId];
+        if (!device) {
+            throw new Error('Invalid device id!');
+        }
+        device.setState(state);
+    });
 };
 
 App.prototype.executeScene = function (sceneId) {
@@ -82,7 +82,11 @@ App.prototype.startServer = function () {
 };
 
 App.prototype.previewSchedule = function () {
-    this.schedule.preview();
+    var _this = this;
+
+    return this.controller.load().then(function () {
+        _this.schedule.preview();
+    });
 };
 
 module.exports = App;

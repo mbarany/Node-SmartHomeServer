@@ -46,17 +46,17 @@ Cli.prototype.execute = function () {
             this.app.startServer();
             break;
         case ACTIONS.PREVIEW:
-            this.app.previewSchedule();
+            return this.app.previewSchedule();
             break;
         case ACTIONS.HELP:
             this.printUsage();
             break;
         case ACTIONS.LIST:
-            this.printDeviceList();
+            return this.printDeviceList();
             break;
         default:
             if (deviceId && state) {
-                this.app.executeDevice(deviceId, state);
+                return this.app.executeDevice(deviceId, state);
             } else if (sceneId) {
                 this.app.executeScene(sceneId);
             } else {
@@ -71,6 +71,7 @@ Cli.prototype.printUsage = function () {
     console.log('  Display this help screen: ' + 'node index.js --help'.yellow);
     console.log('  Start the schedule and API server: ' + 'node index.js --server'.yellow);
     console.log('  List all devices and scenes: ' + 'node index.js --list'.yellow);
+    console.log('  Preview the current schedule: ' + 'node index.js --preview'.yellow);
     console.log('  Change the state of a device: ' + 'node index.js [device] [state]'.yellow);
     console.log('  Execute a scene: ' + 'node index.js [scene]'.yellow);
     console.log('Examples:'.underline.bold);
@@ -80,21 +81,24 @@ Cli.prototype.printUsage = function () {
 };
 
 Cli.prototype.printDeviceList = function () {
+    var _this = this;
     var printer = function (device) {
-        console.log('  ' + device.name + ' (' + device.id + ')');
+        console.log('  ' + device.name + ' (' + device.id + ') - ' + device.status);
     };
-    var categorizedDevices = this.app.controller.getCategorizedDevices();
 
-    console.log('On/Off Switches:'.underline.bold);
-    _(categorizedDevices.switches).each(printer);
-    console.log('Dimmable Switches:'.underline.bold);
-    _(categorizedDevices.dimmableSwitches).each(printer);
-    console.log('Thermostats:'.underline.bold);
-    _(categorizedDevices.thermostats).each(printer);
-    //@todo get Scenes from API
-    console.log('Scenes:'.underline.bold);
-    _(this.config.vera.scenes).each(function (value, key) {
-        console.log('  ' + key + ' (' + value + ')');
+    return this.app.controller.getCategorizedDevices().then(function (categorizedDevices) {
+        console.log('On/Off Switches:'.underline.bold);
+        _(categorizedDevices.switches).each(printer);
+        console.log('Dimmable Switches:'.underline.bold);
+        _(categorizedDevices.dimmableSwitches).each(printer);
+        console.log('Thermostats:'.underline.bold);
+        _(categorizedDevices.thermostats).each(printer);
+
+        //@todo get Scenes from API
+        console.log('Scenes:'.underline.bold);
+        _(_this.config.vera.scenes).each(function (value, key) {
+            console.log('  ' + key + ' (' + value + ')');
+        });
     });
 };
 
