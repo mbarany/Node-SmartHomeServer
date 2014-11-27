@@ -4,4 +4,4 @@ git fetch --all
 git reset --hard origin/master
 git pull
 
-npm install
+npm install --prod
