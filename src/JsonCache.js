@@ -1,3 +1,5 @@
+'use strict';
+
 var jsonfile = require('jsonfile');
 var fs = require('fs');
 var Q = require('q');

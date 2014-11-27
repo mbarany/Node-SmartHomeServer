@@ -1,0 +1,5 @@
+#!/bin/sh
+
+loc=`dirname $BASH_SOURCE`
+
+${loc}/../node_modules/jshint/bin/jshint ${loc}/../

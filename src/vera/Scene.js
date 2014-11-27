@@ -1,9 +1,4 @@
-function _action() {
-    return this.api.action({
-        serviceId: 'urn:micasaverde-com:serviceId:HomeAutomationGateway1',
-        SceneNum: this.getId(),
-    }, 'RunScene');
-}
+'use strict';
 
 var Scene = function (api, sceneId, sceneName) {
     this.api = api;
@@ -11,6 +6,13 @@ var Scene = function (api, sceneId, sceneName) {
     this.sceneName = sceneName;
     return this;
 };
+
+function _action() {
+    return this.api.action({
+        serviceId: 'urn:micasaverde-com:serviceId:HomeAutomationGateway1',
+        SceneNum: this.getId(),
+    }, 'RunScene');
+}
 
 Scene.prototype.getId = function () {
     return this.sceneId;

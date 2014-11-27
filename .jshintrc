@@ -1,0 +1,11 @@
+{
+    "immed": true,
+    "indent": 4,
+    "latedef": true,
+    "loopfunc": true,
+    "multistr": true,
+    "newcap": true,
+    "node": true,
+    "nonew": true,
+    "validthis": true
+}

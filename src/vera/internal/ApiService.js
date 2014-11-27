@@ -1,3 +1,5 @@
+'use strict';
+
 var ApiService = function () {
     if (arguments.length !== 3) {
         throw new Error('ApiService constructor requires 3 arguments!');

@@ -1,3 +1,5 @@
+'use strict';
+
 var router = require('express').Router();
 var auth = require('basic-auth');
 var _ = require('underscore');

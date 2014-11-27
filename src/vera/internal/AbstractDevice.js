@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('underscore');
 
 var ApiService = require('./ApiService');
@@ -39,6 +41,8 @@ AbstractDevice.prototype.getStatus = function () {
 };
 
 AbstractDevice.prototype.setState = function (state) {
+    var num;
+
     if (_.isString(state) && this[state]) {
         return this[state]();
     }

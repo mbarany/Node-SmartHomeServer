@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require("underscore");
 require('colors');
 
@@ -47,13 +49,11 @@ Cli.prototype.execute = function () {
             break;
         case ACTIONS.PREVIEW:
             return this.app.previewSchedule();
-            break;
         case ACTIONS.HELP:
             this.printUsage();
             break;
         case ACTIONS.LIST:
             return this.printDeviceList();
-            break;
         default:
             if (deviceId && state) {
                 return this.app.executeDevice(deviceId, state);

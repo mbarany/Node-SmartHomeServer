@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('underscore');
 var later = require('later');
 var SunCalc = require('suncalc');
@@ -76,6 +78,19 @@ function _getDevice(deviceId) {
     return this.controller.devices[deviceId];
 }
 
+function _setupScheduleSequence(scheduleDate, sequence) {
+    var _this = this;
+    _(sequence).each(function (s) {
+        scheduleDate.add(s.at, 'minutes');
+        var sched = _convertMomentToSchedule.call(_this, scheduleDate);
+        _this._schedules.push({
+            schedule: sched,
+            scenes: s.scenes,
+            devices: s.devices,
+        });
+    });
+}
+
 function _setupSchedule() {
     var _this = this;
     var schedule = this.rawSchedule;
@@ -100,19 +115,6 @@ function _setupSchedule() {
         });
         m.add(1, 'days');
     }
-}
-
-function _setupScheduleSequence(scheduleDate, sequence) {
-    var _this = this;
-    _(sequence).each(function (s) {
-        scheduleDate.add(s.at, 'minutes');
-        var sched = _convertMomentToSchedule.call(_this, scheduleDate);
-        _this._schedules.push({
-            schedule: sched,
-            scenes: s.scenes,
-            devices: s.devices,
-        });
-    });
 }
 
 function _setupTimers() {

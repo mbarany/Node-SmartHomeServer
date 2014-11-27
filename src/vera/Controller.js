@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require("underscore");
 
 var log = require('../log');
@@ -26,28 +28,6 @@ var DEVICE_TYPE = {
     THERMOSTAT: 'urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1',
 };
 
-function _loadDevices() {
-    var _this = this;
-    var cacheTime = this.clearDeviceCache ? 0 : 30 * 60;
-
-    this.clearDeviceCache = false;
-    return this.cache.get(CACHE_DEVICES, cacheTime)
-        .then(function (data) {
-            log('Using devices cache...');
-            _this.deviceData = data;
-        }, function () {
-            return _loadDevicesFromApi.call(_this)
-                .then(function (devices) {
-                    _this.deviceData = devices;
-                    log('Writing deviceData to cache...');
-                    _this.cache.set(CACHE_DEVICES, _this.deviceData);
-                });
-        })
-        .then(function () {
-            _createDeviceInstances.call(_this);
-        });
-}
-
 function _loadDevicesFromApi() {
     var _this = this;
 
@@ -68,15 +48,6 @@ function _loadDevicesFromApi() {
         });
 }
 
-function _createDeviceInstances() {
-    var _this = this;
-
-    _(this.deviceData).each(function (device) {
-        var clazz = _getDeviceClass.call(this, device.deviceType);
-        _this.devices[device.id] = new clazz(_this.api, device);
-    });
-}
-
 function _getDeviceClass(deviceType) {
     switch (deviceType) {
         case DEVICE_TYPE.BINARY_SWITCH:
@@ -88,6 +59,37 @@ function _getDeviceClass(deviceType) {
         default:
             throw new Error('Unknown deviceType "' + deviceType + '"!');
     }
+}
+
+function _createDeviceInstances() {
+    var _this = this;
+
+    _(this.deviceData).each(function (device) {
+        var Clazz = _getDeviceClass.call(this, device.deviceType);
+        _this.devices[device.id] = new Clazz(_this.api, device);
+    });
+}
+
+function _loadDevices() {
+    var _this = this;
+    var cacheTime = this.clearDeviceCache ? 0 : 30 * 60;
+
+    this.clearDeviceCache = false;
+    return this.cache.get(CACHE_DEVICES, cacheTime)
+        .then(function (data) {
+            log('Using devices cache...');
+            _this.deviceData = data;
+        }, function () {
+            return _loadDevicesFromApi.call(_this)
+                .then(function (devices) {
+                    _this.deviceData = devices;
+                    log('Writing deviceData to cache...');
+                    _this.cache.set(CACHE_DEVICES, _this.deviceData);
+                });
+        })
+        .then(function () {
+            _createDeviceInstances.call(_this);
+        });
 }
 
 function _getCategorizedDevices() {

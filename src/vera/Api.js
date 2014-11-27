@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require("underscore");
 var Q = require('q');
 var fs = require('fs');
@@ -21,21 +23,26 @@ var Api = function (config, appDir, cache) {
 
 var CACHE_REMOTE_URL_SESSION = 'remote_url_session';
 
-function _loadRemoteUrl() {
-    var _this = this;
+function _wrapBadSSLChain(options) {
+    var defaultOpts = {
+        ca: [
+            fs.readFileSync(this.appDir + 'certs/gd-class2-root.crt'),
+            fs.readFileSync(this.appDir + 'certs/gd_intermediate.crt')
+        ]
+    };
+    var opts = _.extend({}, defaultOpts, options);
 
-    return this.cache.get(CACHE_REMOTE_URL_SESSION, 30 * 60)
-        .then(function (remoteUrlSession) {
-            log('Using remoteUrlSession cache...');
-            _this.remoteUrlSession = remoteUrlSession;
-        }, function () {
-            return _loadRemoteUrlFromApi.call(_this)
-                .then(function (remoteUrlSession) {
-                    _this.remoteUrlSession = remoteUrlSession;
-                    log('Writing remoteUrlSession to cache...');
-                    _this.cache.set(CACHE_REMOTE_URL_SESSION, _this.remoteUrlSession);
-                });
-        });
+    opts.agent = new https.Agent(opts);
+    return opts;
+}
+
+function _readCookie(cookie, cookieName) {
+    var re = new RegExp('[; ]'+cookieName+'=([^\\s;]*)');
+    var sMatch = (' '+cookie).match(re);
+    if (cookieName && sMatch) {
+        return sMatch[1];
+    }
+    return '';
 }
 
 function _loadRemoteUrlFromApi() {
@@ -116,26 +123,21 @@ function _loadRemoteUrlFromApi() {
         });
 }
 
-function _wrapBadSSLChain(options) {
-    var defaultOpts = {
-        ca: [
-            fs.readFileSync(this.appDir + 'certs/gd-class2-root.crt'),
-            fs.readFileSync(this.appDir + 'certs/gd_intermediate.crt')
-        ]
-    };
-    var opts = _.extend({}, defaultOpts, options);
+function _loadRemoteUrl() {
+    var _this = this;
 
-    opts.agent = new https.Agent(opts);
-    return opts;
-}
-
-function _readCookie(cookie, cookieName) {
-    var re = new RegExp('[; ]'+cookieName+'=([^\\s;]*)');
-    var sMatch = (' '+cookie).match(re);
-    if (cookieName && sMatch) {
-        return sMatch[1];
-    }
-    return '';
+    return this.cache.get(CACHE_REMOTE_URL_SESSION, 30 * 60)
+        .then(function (remoteUrlSession) {
+            log('Using remoteUrlSession cache...');
+            _this.remoteUrlSession = remoteUrlSession;
+        }, function () {
+            return _loadRemoteUrlFromApi.call(_this)
+                .then(function (remoteUrlSession) {
+                    _this.remoteUrlSession = remoteUrlSession;
+                    log('Writing remoteUrlSession to cache...');
+                    _this.cache.set(CACHE_REMOTE_URL_SESSION, _this.remoteUrlSession);
+                });
+        });
 }
 
 function _getRemoteUrl() {
@@ -181,7 +183,7 @@ function _doRequest(allParams) {
 
 Api.prototype.load = function () {
     if (!this.config.useRemote) {
-        return Q();
+        return new Q();
     }
     return _loadRemoteUrl.call(this);
 };

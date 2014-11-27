@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require("underscore");
 var later = require('later');
 var Q = require('q');
@@ -10,6 +12,15 @@ var Schedule = require('./Schedule');
 var webServer = require('./web/server');
 
 
+function _loadScenes() {
+    var _this = this;
+    var scenes = {};
+    _(this.config.vera.scenes).each(function (value, key) {
+        scenes[value] = new VeraScene(_this.api, value, key);
+    });
+    return scenes;
+}
+
 var App = function (config, appDir, cache) {
     this.config = config;
     this.appDir = appDir;
@@ -20,15 +31,6 @@ var App = function (config, appDir, cache) {
     this.schedule = new Schedule(this.controller, this.scenes, config.schedule, config.location);
 };
 
-function _loadScenes() {
-    var _this = this;
-    var scenes = {};
-    _(this.config.vera.scenes).each(function (value, key) {
-        scenes[value] = new VeraScene(_this.api, value, key);
-    });
-    return scenes;
-}
-
 function _setupSchedule() {
     log.line('Setting up schedule...', true);
     this.schedule.run();
@@ -36,7 +38,7 @@ function _setupSchedule() {
 }
 
 App.prototype.load = function () {
-    return Q();
+    return new Q();
 };
 
 App.prototype.executeDevice = function (deviceId, state) {
