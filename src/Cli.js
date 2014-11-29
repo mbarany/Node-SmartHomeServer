@@ -45,8 +45,7 @@ Cli.prototype.execute = function () {
 
     switch (actionAndArgs.action) {
         case ACTIONS.SERVER:
-            this.app.startServer();
-            break;
+            return this.app.startServer();
         case ACTIONS.PREVIEW:
             return this.app.previewSchedule();
         case ACTIONS.HELP:

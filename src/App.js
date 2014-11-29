@@ -69,18 +69,20 @@ App.prototype.startServer = function () {
         .on(later.hour.val(startOfWeek)).hour()
         .on(later.minute.val(startOfWeek)).minute();
 
-    _setupSchedule.call(this);
-    // Run weekly
-    later.setInterval(function () {
+    return this.controller.load().then(function () {
         _setupSchedule.call(_this);
-    }, sched);
+        // Run weekly
+        later.setInterval(function () {
+            _setupSchedule.call(_this);
+        }, sched);
 
-    if (this.config.api.disabled) {
-        return;
-    }
-    log.line('Starting API Server...', true);
-    webServer(this);
-    log.line('Done.' + "\n");
+        if (_this.config.api.disabled) {
+            return;
+        }
+        log.line('Starting API Server...', true);
+        webServer(_this);
+        log.line('Done.' + "\n");
+    });
 };
 
 App.prototype.previewSchedule = function () {
