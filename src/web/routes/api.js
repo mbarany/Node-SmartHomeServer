@@ -28,6 +28,7 @@ router.use(function(req, res, next) {
 
 router.get('/devices', function (req, res) {
     app.controller.getCategorizedDevices().then(function (devices) {
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
         res.send(devices);
     });
 });

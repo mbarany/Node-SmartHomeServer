@@ -19,55 +19,56 @@ var SERVICES = {
     ),
 };
 
-var Thermostat = function () {
-    this.initialize.apply(this, arguments);
-};
-Thermostat.prototype = _.clone(AbstractDevice.prototype);
+var Thermostat = AbstractDevice.extend({
 
-Thermostat.prototype.setStateNumber = function (value) {
-    return this.temperature(value);
-};
+    type: 'Thermostat',
 
-Thermostat.prototype.temperature = function (value) {
-    value = parseInt(value, 10);
-    if (!value) {
-        throw new Error('Invalid temperature "' + value + '"!');
-    }
-    return this._action(SERVICES.TEMPERATURE, value);
-};
+    setStateNumber: function (value) {
+        return this.temperature(value);
+    },
 
-Thermostat.prototype.getStatus = function () {
-    if (this.status.mode !== 'Off') {
-        return this.status.mode + ' ' + this.status.temperature + '°F';
-    }
-    return 'Off';
-};
+    temperature: function (value) {
+        value = parseInt(value, 10);
+        if (!value) {
+            throw new Error('Invalid temperature "' + value + '"!');
+        }
+        return this._action(SERVICES.TEMPERATURE, value);
+    },
 
-Thermostat.prototype.off = function () {
-    return this._action(SERVICES.MODE, 'Off');
-};
+    getStatus: function () {
+        if (this.status.mode !== 'Off') {
+            return this.status.mode + ' ' + this.status.temperature + '°F';
+        }
+        return 'Off';
+    },
 
-Thermostat.prototype.heatOn = function () {
-    return this._action(SERVICES.MODE, 'HeatOn');
-};
+    off: function () {
+        return this._action(SERVICES.MODE, 'Off');
+    },
 
-Thermostat.prototype.coolOn = function () {
-    return this._action(SERVICES.MODE, 'CoolOn');
-};
+    heatOn: function () {
+        return this._action(SERVICES.MODE, 'HeatOn');
+    },
 
-Thermostat.prototype.parseStates = function (states) {
-    var stateMode = _(states).where({
-        service: SERVICES.MODE.serviceId,
-        variable: 'ModeTarget'
-    })[0];
-    var stateTemperature = _(states).where({
-        service: SERVICES.TEMPERATURE.serviceId,
-        variable: 'CurrentSetpoint'
-    })[0];
-    this.status = {
-        mode: stateMode.value,
-        temperature: stateTemperature.value,
-    };
-};
+    coolOn: function () {
+        return this._action(SERVICES.MODE, 'CoolOn');
+    },
+
+    parseStates: function (states) {
+        var stateMode = _(states).where({
+            service: SERVICES.MODE.serviceId,
+            variable: 'ModeTarget'
+        })[0];
+        var stateTemperature = _(states).where({
+            service: SERVICES.TEMPERATURE.serviceId,
+            variable: 'CurrentSetpoint'
+        })[0];
+        this.status = {
+            mode: stateMode.value,
+            temperature: parseInt(stateTemperature.value, 10),
+        };
+    },
+
+});
 
 module.exports = Thermostat;

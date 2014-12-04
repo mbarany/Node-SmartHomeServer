@@ -14,33 +14,34 @@ var SERVICES = {
     ),
 };
 
-var Switch = function () {
-    this.initialize.apply(this, arguments);
-};
-Switch.prototype = _.clone(AbstractDevice.prototype);
+var Switch = AbstractDevice.extend({
 
-Switch.prototype.on = function () {
-    return this._action(SERVICES.SWITCH, 1);
-};
+    type: 'Switch',
 
-Switch.prototype.off = function () {
-    return this._action(SERVICES.SWITCH, 0);
-};
+    on: function () {
+        return this._action(SERVICES.SWITCH, 1);
+    },
 
-Switch.prototype.getStatus = function () {
-    return this.status ? 'On' : 'Off';
-};
+    off: function () {
+        return this._action(SERVICES.SWITCH, 0);
+    },
 
-Switch.prototype.setStateNumber = function (value) {
-    throw new Error('Invalid state for value "' + value + '"!');
-};
+    getStatus: function () {
+        return this.status ? 'On' : 'Off';
+    },
 
-Switch.prototype.parseStates = function (states) {
-    var state = _(states).where({
-        service: SERVICES.SWITCH.serviceId,
-        variable: 'Target'
-    })[0];
-    this.status = parseInt(state.value, 10);
-};
+    setStateNumber: function (value) {
+        throw new Error('Invalid state for value "' + value + '"!');
+    },
+
+    parseStates: function (states) {
+        var state = _(states).where({
+            service: SERVICES.SWITCH.serviceId,
+            variable: 'Target'
+        })[0];
+        this.status = parseInt(state.value, 10);
+    },
+
+});
 
 module.exports = Switch;

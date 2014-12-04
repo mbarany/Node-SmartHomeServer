@@ -5,14 +5,27 @@ var _ = require('underscore');
 var ApiService = require('./ApiService');
 
 
-var AbstractDevice = function () {};
-
-AbstractDevice.prototype.initialize = function (api, deviceData) {
+var AbstractDevice = function (api, deviceData) {
     this.api = api;
     this.deviceId = deviceData.id;
     this.deviceName = deviceData.name;
     this.parseStates(deviceData.states);
     return this;
+};
+
+AbstractDevice.extend = function (subPrototype) {
+    var Clazz = function () {
+        this._super.constructor.apply(this, arguments);
+    };
+
+    subPrototype = subPrototype || {};
+    Clazz.prototype = Object.create(AbstractDevice.prototype);
+    Clazz.prototype.constructor = Clazz;
+    Clazz.prototype._super = AbstractDevice.prototype;
+    _(subPrototype).each(function (value, key) {
+        Clazz.prototype[key] = value;
+    });
+    return Clazz;
 };
 
 AbstractDevice.prototype._action = function (service, actionValue) {

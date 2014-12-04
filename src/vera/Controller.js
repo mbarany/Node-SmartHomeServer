@@ -103,7 +103,9 @@ function _getCategorizedDevices() {
         var data = {
             id: device.getId(),
             name: device.getName(),
-            status: device.getStatus(),
+            type: device.type,
+            status: device.status,
+            statusText: device.getStatus(),
         };
 
         if (device instanceof Switch) {
