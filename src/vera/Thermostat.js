@@ -57,7 +57,7 @@ var Thermostat = AbstractDevice.extend({
     parseStates: function (states) {
         var stateMode = _(states).where({
             service: SERVICES.MODE.serviceId,
-            variable: 'ModeTarget'
+            variable: 'ModeStatus'
         })[0];
         var stateTemperature = _(states).where({
             service: SERVICES.TEMPERATURE.serviceId,
