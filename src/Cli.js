@@ -82,7 +82,7 @@ Cli.prototype.printUsage = function () {
 Cli.prototype.printDeviceList = function () {
     var _this = this;
     var printer = function (device) {
-        console.log('  ' + device.name + ' (' + device.id + ') - ' + device.status);
+        console.log('  ' + device.name + ' (' + device.id + ') - ' + device.statusText);
     };
 
     return this.app.controller.getCategorizedDevices().then(function (categorizedDevices) {

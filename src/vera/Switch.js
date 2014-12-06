@@ -37,7 +37,7 @@ var Switch = AbstractDevice.extend({
     parseStates: function (states) {
         var state = _(states).where({
             service: SERVICES.SWITCH.serviceId,
-            variable: 'Target'
+            variable: 'Status'
         })[0];
         this.status = parseInt(state.value, 10);
     },
