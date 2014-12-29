@@ -4,7 +4,8 @@ var _ = require("underscore");
 var later = require('later');
 var Q = require('q');
 
-var log = require('./log');
+var log = require('./log').prefix('App');
+var errors = require('./errors');
 var VeraApi = require("./vera/Api");
 var VeraController = require('./vera/Controller');
 var VeraScene = require("./vera/Scene");
@@ -47,7 +48,7 @@ App.prototype.executeDevice = function (deviceId, state) {
     return this.controller.load().then(function () {
         var device = _this.controller.devices[deviceId];
         if (!device) {
-            throw new Error('Invalid device id!');
+            throw new errors.ClientError('Invalid device id!');
         }
         device.setState(state);
     });

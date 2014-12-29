@@ -47,8 +47,11 @@ var DimmableSwitch = AbstractDevice.extend({
         var state = _(states).where({
             service: SERVICES.DIMMER.serviceId,
             variable: 'LoadLevelStatus'
-        })[0];
-        this.status = parseInt(state.value, 10);
+        });
+
+        if (state.length) {
+            this.status = parseInt(state[0].value, 10);
+        }
     },
 
 });

@@ -2,7 +2,7 @@
 
 var _ = require("underscore");
 
-var log = require('../log');
+var log = require('../log').prefix('Controller');
 var Switch = require('./Switch');
 var DimmableSwitch = require('./DimmableSwitch');
 var Thermostat = require('./Thermostat');

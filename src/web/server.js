@@ -5,7 +5,7 @@ var _ = require('underscore');
 var https = require('https');
 var fs = require('fs');
 
-var log = require('../log');
+var log = require('../log').prefix('Api');
 
 
 function getSslOptions(rootApp) {
@@ -40,8 +40,10 @@ function createServer (rootApp) {
     });
 
     server.use(function(err, req, res, next){
+        var msg = err.message || 'Error!';
+
         log(err.stack);
-        res.status(500).send(err.message || 'Error!');
+        res.status(500).send({ error: msg });
     });
 
     if (secureServer) {
@@ -49,7 +51,7 @@ function createServer (rootApp) {
     } else {
         server.listen(port);
     }
-    log.line('[Listening on port ' + port + ']...');
+    log.line('Listening on port ' + port + '...');
 
     return server;
 }

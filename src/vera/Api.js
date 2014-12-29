@@ -7,7 +7,7 @@ var http = require("q-io/http");
 var https = require("https");
 var cheerio = require("cheerio");
 
-var log = require('../log');
+var log = require('../log').prefix('VeraApi');
 
 
 var defaultParams = {
@@ -165,18 +165,20 @@ function _paramsToQueryString(params) {
 }
 
 function _doRequest(allParams) {
-    var url = _paramsToQueryString.call(this, allParams);
+    var _this = this;
 
-    log('Url: ' + url);
-    return http.request({
-        url: _getUrl.call(this) + url,
-        method: 'GET',
-    })
-    .then(function (res) {
+    return this.load().then(function () {
+        var url = _paramsToQueryString.call(_this, allParams);
+
+        log('Url: ' + url);
+        return http.request({
+            url: _getUrl.call(_this) + url,
+            method: 'GET',
+        });
+    }).then(function (res) {
         log('API Status: ' + res.status);
         return res.body.read();
-    })
-    .then(function (bodyBuffer) {
+    }).then(function (bodyBuffer) {
         return JSON.parse(bodyBuffer.toString());
     });
 }
@@ -193,9 +195,7 @@ Api.prototype.action = function (params, action) {
     var allParams = _.extend({}, defaultParams, params);
 
     allParams.action = action;
-    return this.load().then(function () {
-        return _doRequest.call(_this, allParams);
-    });
+    return _doRequest.call(_this, allParams);
 };
 
 Api.prototype.userData = function () {
@@ -204,9 +204,16 @@ Api.prototype.userData = function () {
         id: 'user_data',
     };
 
-    return this.load().then(function () {
-        return _doRequest.call(_this, allParams);
-    });
+    return _doRequest.call(_this, allParams);
+};
+
+Api.prototype.status = function (params) {
+    var _this = this;
+    var allParams = _.extend({}, {
+        id: 'status'
+    }, params);
+
+    return _doRequest.call(_this, allParams);
 };
 
 module.exports = Api;

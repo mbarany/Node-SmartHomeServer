@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('underscore');
 var moment = require('moment-timezone');
 
 
@@ -18,6 +19,23 @@ log.line = function (line, isStartOfLine) {
         process.stdout.write(_getFormattedDate() + ' ');
     }
     process.stdout.write(line);
+};
+
+log.prefix = function (prefix) {
+    var logPrefix = function () {
+        var args = ['[' + prefix + ']'];
+        args.push.apply(args, arguments);
+        log.apply(log, args);
+    };
+
+    logPrefix.line = function (line, isStartOfLine) {
+        if (isStartOfLine) {
+            line = '[' + prefix + '] ' + line;
+        }
+        log.line.call(log, line, isStartOfLine);
+    };
+
+    return logPrefix;
 };
 
 module.exports = log;
