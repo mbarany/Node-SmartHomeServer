@@ -13,23 +13,18 @@ var Schedule = require('./Schedule');
 var webServer = require('./web/server');
 
 
-function _loadScenes() {
+var App = function (nconf, appDir, cache) {
     var _this = this;
-    var scenes = {};
-    _(this.config.vera.scenes).each(function (value, key) {
-        scenes[value] = new VeraScene(_this.api, value, key);
-    });
-    return scenes;
-}
 
-var App = function (config, appDir, cache) {
-    this.config = config;
     this.appDir = appDir;
     this.cache = cache;
-    this.api = new VeraApi(config.vera.api, this.appDir, this.cache);
-    this.scenes = _loadScenes.call(this);
+    this.api = new VeraApi(nconf.get('vera:api'), this.appDir, this.cache);
+    this.scenes = _(nconf.get('vera:scenes')).map(function (value, key) {
+        return new VeraScene(_this.api, value, key);
+    });
     this.controller = new VeraController(this.api, this.cache);
-    this.schedule = new Schedule(this.controller, this.scenes, config.schedule, config.location);
+    this.schedule = new Schedule(this.controller, this.scenes, nconf.get('schedule'), nconf.get('location'));
+    this.apiServerDisabled = nconf.get('api:disabled');
 };
 
 function _setupSchedule() {
@@ -59,7 +54,7 @@ App.prototype.executeScene = function (sceneId) {
     if (!scene) {
         throw new Error('Invalid scene id!');
     }
-    scene.run();
+    return scene.run();
 };
 
 App.prototype.startServer = function () {
@@ -77,7 +72,7 @@ App.prototype.startServer = function () {
             _setupSchedule.call(_this);
         }, sched);
 
-        if (_this.config.api.disabled) {
+        if (_this.apiServerDisabled) {
             return;
         }
         log.line('Starting API Server...', true);

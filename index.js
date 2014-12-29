@@ -6,17 +6,23 @@ var log = require('./src/log');
 var JsonCache = require('./src/JsonCache');
 var Cli = require('./src/Cli');
 var App = require('./src/App');
+var nconf = require('nconf');
 var config = require('./config/config');
 
 
 var appDir = require('path').dirname(require.main.filename) + '/';
-var args = _(process.argv).rest(2);
 var cache = new JsonCache(appDir + 'cache/');
-var app = new App(config, appDir, cache);
-var cli = new Cli(app);
+var app;
 
+
+nconf.argv()
+    .env()
+    .defaults(config);
+
+app = new App(nconf, appDir, cache);
 app.load().then(function () {
-    return cli.execute.apply(cli, args);
+    var cli = new Cli(app);
+    return cli.execute(nconf);
 }).fail(function (err) {
     log(err);
 });

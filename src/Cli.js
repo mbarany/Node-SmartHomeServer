@@ -1,68 +1,43 @@
 'use strict';
 
-var _ = require("underscore");
+var _ = require('underscore');
+var Q = require('q');
 require('colors');
 
 
 var Cli = function (app) {
     this.app = app;
-    this.config = app.config;
 };
 
 var ACTIONS = {
-    HELP: '--help',
-    LIST: '--list',
-    SERVER: '--server',
-    PREVIEW: '--preview',
+    HELP: 'help',
+    LIST: 'list',
+    SERVER: 'server',
+    PREVIEW: 'preview',
 };
 
-function _getActionAndArgs(args) {
-    var actionAndArgs = {
-        args: [],
-    };
-    _(args).each(function (arg) {
-        if (arg.substring(0, 2) === '--') {
-            actionAndArgs.action = arg;
-        } else {
-            actionAndArgs.args.push(arg);
-        }
-    });
-    return actionAndArgs;
-}
+Cli.prototype.execute = function (nconf) {
+    var args = nconf.get('_');
 
-function _getSceneIdFromName(sceneName) {
-    if (sceneName && this.config.vera.scenes[sceneName]) {
-        return this.config.vera.scenes[sceneName];
+    if (nconf.get(ACTIONS.SERVER)) {
+        return this.app.startServer();
     }
-}
-
-Cli.prototype.execute = function () {
-    var actionAndArgs = _getActionAndArgs(arguments);
-    var args = actionAndArgs.args;
-    var deviceId = args[0];
-    var sceneId = _getSceneIdFromName.call(this, args[0]);
-    var state = args[1];
-
-    switch (actionAndArgs.action) {
-        case ACTIONS.SERVER:
-            return this.app.startServer();
-        case ACTIONS.PREVIEW:
-            return this.app.previewSchedule();
-        case ACTIONS.HELP:
-            this.printUsage();
-            break;
-        case ACTIONS.LIST:
-            return this.printDeviceList();
-        default:
-            if (deviceId && state) {
-                return this.app.executeDevice(deviceId, state);
-            } else if (sceneId) {
-                this.app.executeScene(sceneId);
-            } else {
-                this.printUsage();
-            }
-            break;
+    if (nconf.get(ACTIONS.PREVIEW)) {
+        return this.app.previewSchedule();
     }
+    if (nconf.get(ACTIONS.LIST)) {
+        return this.printDeviceList(nconf);
+    }
+    if (nconf.get(ACTIONS.HELP)) {
+        return this.printUsage();
+    }
+    if (args.length === 2) {
+        return this.app.executeDevice(args[0], args[1]);
+    }
+    if (args.length === 1) {
+        return this.app.executeScene(args[0]);
+    }
+    return this.printUsage();
 };
 
 Cli.prototype.printUsage = function () {
@@ -71,16 +46,18 @@ Cli.prototype.printUsage = function () {
     console.log('  Start the schedule and API server: ' + 'node index.js --server'.yellow);
     console.log('  List all devices and scenes: ' + 'node index.js --list'.yellow);
     console.log('  Preview the current schedule: ' + 'node index.js --preview'.yellow);
-    console.log('  Change the state of a device: ' + 'node index.js [device] [state]'.yellow);
-    console.log('  Execute a scene: ' + 'node index.js [scene]'.yellow);
+    console.log('  Change the state of a device: ' + 'node index.js [deviceId] [state]'.yellow);
+    console.log('  Execute a scene: ' + 'node index.js [sceneId]'.yellow);
     console.log('Examples:'.underline.bold);
     console.log('  Turn den light off: ' + 'node index.js den off'.yellow);
     console.log('  Change main thermostat temperature: ' + 'node index.js main 70'.yellow);
     console.log('  Turn on all lights: ' + 'node index.js all_lights_on'.yellow);
+
+    return Q();
 };
 
-Cli.prototype.printDeviceList = function () {
-    var _this = this;
+Cli.prototype.printDeviceList = function (nconf) {
+    var scenes = nconf.get('vera:scenes');
     var printer = function (device) {
         console.log('  ' + device.name + ' (' + device.id + ') - ' + device.statusText);
     };
@@ -95,7 +72,7 @@ Cli.prototype.printDeviceList = function () {
 
         //@todo get Scenes from API
         console.log('Scenes:'.underline.bold);
-        _(_this.config.vera.scenes).each(function (value, key) {
+        _(scenes).each(function (value, key) {
             console.log('  ' + key + ' (' + value + ')');
         });
     });

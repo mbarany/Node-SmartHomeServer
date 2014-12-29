@@ -62,12 +62,11 @@ router.post('/devices/:deviceId/:newState', function (req, res) {
 router.post('/scenes/:sceneId', function (req, res) {
     var sceneId = req.params.sceneId;
 
-    try {
-        app.executeScene(sceneId);
+    app.executeScene(sceneId).then(function () {
         res.send();
-    } catch (err) {
+    }, function (err) {
         _sendError(res, err);
-    }
+    });
 });
 
 module.exports = function (rootApp) {
