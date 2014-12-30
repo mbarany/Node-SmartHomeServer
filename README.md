@@ -14,10 +14,16 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 - Set the main thermostat to 70 degrees every weekday at 8am
 
 
+# Global Dependencies
+- node/npm http://nodejs.org/
+- forever `[sudo] npm install forever -g`
+
+
 # Setup
 - Copy `config/config.sample.js` to `config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
-- `npm install`
-- `node index.js --help` for usage
+- Run the Install/Update script `./bin/update`
+- Run `node index.js --help` for usage
+- Run `./bin/start` to start the server with forever
 
 
 # Updating
@@ -27,8 +33,9 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 # Usage
 - Start the schedule and API Server: `node index.js --server`
 - List all available devices: `node index.js --list`
-- Change the state of a device: `node index.js [device] [state]`
-- Execute a scene: `node index.js [scene]`
+- Preview the current schedule: `node index.js --preview`
+- Change the state of a device: `node index.js [deviceId] [state]`
+- Execute a scene: `node index.js [sceneId]`
 
 
 # API

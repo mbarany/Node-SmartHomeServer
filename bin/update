@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+BASEDIR=$(dirname $0)
 
 git clean -f
 git fetch --all
@@ -6,3 +8,5 @@ git reset --hard origin/master
 git pull
 
 npm install --prod
+node $BASEDIR/dist.js
+ln -sf $BASEDIR/../dist/crontab /etc/cron.d/Node-VeraSmartHomeServer
