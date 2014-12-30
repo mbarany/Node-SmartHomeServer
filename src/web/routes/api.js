@@ -9,9 +9,10 @@ var errors = require('../../errors');
 
 
 var app;
+var config;
 
 function _validateUser (user) {
-    var accessTokens = app.config.api.accessTokens || [];
+    var accessTokens = config.accessTokens || [];
 
     if (!user || !user.name || user.pass !== '') {
         return false;
@@ -69,7 +70,8 @@ router.post('/scenes/:sceneId', function (req, res) {
     });
 });
 
-module.exports = function (rootApp) {
+module.exports = function (rootApp, apiConfig) {
     app = rootApp;
+    config = apiConfig;
     return router;
 };

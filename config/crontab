@@ -1,2 +1,2 @@
 # Node Vera Scheduling Server
-@reboot forever --watch --minUptime 5000 --spinSleepTime 2000 --watchDirectory ${ROOT_DIR}/ start ${ROOT_DIR}/index.js --server
+@reboot root forever --watch --minUptime 5000 --spinSleepTime 2000 --watchDirectory ${ROOT_DIR}/ start ${ROOT_DIR}/index.js --server

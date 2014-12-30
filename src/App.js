@@ -3,6 +3,7 @@
 var _ = require("underscore");
 var later = require('later');
 var Q = require('q');
+var Pushbullet = require('pushbullet')
 
 var log = require('./log').prefix('App');
 var errors = require('./errors');
@@ -24,13 +25,19 @@ var App = function (nconf, appDir, cache) {
     });
     this.controller = new VeraController(this.api, this.cache);
     this.schedule = new Schedule(this.controller, this.scenes, nconf.get('schedule'), nconf.get('location'));
-    this.apiServerDisabled = nconf.get('api:disabled');
+    this.apiServerConfig = nconf.get('api');
+    this.pushbulletConfig = nconf.get('pushbullet');
 };
 
 function _setupSchedule() {
     log.line('Setting up schedule...', true);
     this.schedule.run();
     log.line('Done.' + "\n");
+}
+
+function sendStartNotif(config) {
+    var pusher = new Pushbullet(config.accessToken);
+    pusher.note(config.device, 'Node Vera Server', 'The server has started', function(error, response) {});
 }
 
 App.prototype.load = function () {
@@ -72,12 +79,15 @@ App.prototype.startServer = function () {
             _setupSchedule.call(_this);
         }, sched);
 
-        if (_this.apiServerDisabled) {
+        if (_this.apiServerConfig.disabled) {
             return;
         }
         log.line('Starting API Server...', true);
-        webServer(_this);
+        webServer(_this, _this.apiServerConfig);
         log.line('Done.' + "\n");
+        if (_this.pushbulletConfig.accessToken && _this.pushbulletConfig.device) {
+            sendStartNotif.call(_this, _this.pushbulletConfig);
+        }
     });
 };
 

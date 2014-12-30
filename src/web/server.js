@@ -8,32 +8,32 @@ var fs = require('fs');
 var log = require('../log').prefix('Api');
 
 
-function getSslOptions(rootApp) {
+function getSslOptions(rootApp, apiConfig) {
     var options = {
-        key: fs.readFileSync(rootApp.appDir + rootApp.config.api.key),
-        cert: fs.readFileSync(rootApp.appDir + rootApp.config.api.cert),
+        key: fs.readFileSync(rootApp.appDir + apiConfig.key),
+        cert: fs.readFileSync(rootApp.appDir + apiConfig.cert),
         ca: []
     };
 
-    _(rootApp.config.api.caBundle).each(function (ca) {
+    _(apiConfig.caBundle).each(function (ca) {
         options.ca.push(fs.readFileSync(rootApp.appDir + ca));
     });
 
     return options;
 }
 
-function createServer (rootApp) {
-    var port = rootApp.config.api.port;
+function createServer (rootApp, apiConfig) {
+    var port = apiConfig.port;
     var server = express();
     var secureServer;
 
-    if (rootApp.config.api.isSecure) {
-        secureServer = https.createServer(getSslOptions(rootApp), server);
+    if (apiConfig.isSecure) {
+        secureServer = https.createServer(getSslOptions(rootApp, apiConfig), server);
     }
 
     server.set('x-powered-by', false);
 
-    server.use('/api', require('./routes/api')(rootApp));
+    server.use('/api', require('./routes/api')(rootApp, apiConfig));
 
     server.get('/', function (req, res) {
         res.send('Nothing to see here.');
