@@ -7,6 +7,5 @@ git fetch --all
 git reset --hard origin/master
 git pull
 
-npm install --prod
-node $BASEDIR/dist.js
-ln -sf $BASEDIR/../dist/crontab /etc/cron.d/Node-VeraSmartHomeServer
+# Run the extended file (that was just updated) in case of modifications to the update script
+$BASEDIR/update-extended
