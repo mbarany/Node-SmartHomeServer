@@ -146,13 +146,15 @@ function _setupTimers() {
     });
 }
 
-function _printSchedule() {
+function _previewSchedule() {
     var _this = this;
     var startOfWeek = this.getStartOfWeek();
     var scheduleStartDate = startOfWeek.toDate();
-    var title = startOfWeek.year() + ' schedule for Week #' + startOfWeek.week();
+    var preview = {
+        title: startOfWeek.year() + ' schedule for Week #' + startOfWeek.week(),
+        events: [],
+    };
 
-    console.log(title.green.bold.underline, '\n');
     _(this._schedules).each(function (s) {
         var scenes = _(s.scenes).map(function (sceneId) {
             var scene = _getScene.call(_this, sceneId);
@@ -164,20 +166,16 @@ function _printSchedule() {
             var d = _getDevice.call(_this, deviceId);
             return d.getName() + '(' + state + ')';
         });
-
         var nextDate = later.schedule(s.schedule).next(1, scheduleStartDate);
         var nextMoment = moment.tz(nextDate, _this.getTimezone());
-        console.log(nextMoment.format(DATE_FORMAT).bold.underline);
-        if (scenes.length) {
-            console.log('  Scenes:');
-            console.log('    ' + scenes.join(', '));
-        }
-        if (devices.length) {
-            console.log('  Devices:');
-            console.log('    ' + devices.join(', '));
-        }
-        console.log('');
+
+        preview.events.push({
+            date: nextMoment.format(DATE_FORMAT),
+            scenes: scenes.length ? scenes.join(', ') : '',
+            devices: devices.length ? devices.join(', ') : '',
+        });
     });
+    return preview;
 }
 
 Schedule.TYPES = {
@@ -210,7 +208,7 @@ Schedule.prototype.getStartOfWeek = function () {
 
 Schedule.prototype.preview = function () {
     _setupSchedule.call(this);
-    _printSchedule.call(this);
+    return _previewSchedule.call(this);
 };
 
 Schedule.prototype.run = function () {

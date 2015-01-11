@@ -3,7 +3,7 @@
 var _ = require("underscore");
 var later = require('later');
 var Q = require('q');
-var Pushbullet = require('pushbullet')
+var Pushbullet = require('pushbullet');
 
 var log = require('./log').prefix('App');
 var errors = require('./errors');
@@ -95,7 +95,7 @@ App.prototype.previewSchedule = function () {
     var _this = this;
 
     return this.controller.load().then(function () {
-        _this.schedule.preview();
+        return _this.schedule.preview();
     });
 };
 

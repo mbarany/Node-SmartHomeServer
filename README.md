@@ -91,6 +91,9 @@ Sets a new state given a device id
 ## POST /api/scenes/{sceneId}
 Runs a scene given a scene id
 
+## GET /api/schedule
+Returns an the schedule for the current week
+
 
 License
 =======

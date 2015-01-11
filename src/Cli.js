@@ -23,7 +23,7 @@ Cli.prototype.execute = function (nconf) {
         return this.app.startServer();
     }
     if (nconf.get(ACTIONS.PREVIEW)) {
-        return this.app.previewSchedule();
+        return this.printSchedulePreview();
     }
     if (nconf.get(ACTIONS.LIST)) {
         return this.printDeviceList(nconf);
@@ -53,7 +53,7 @@ Cli.prototype.printUsage = function () {
     console.log('  Change main thermostat temperature: ' + 'node index.js main 70'.yellow);
     console.log('  Turn on all lights: ' + 'node index.js all_lights_on'.yellow);
 
-    return Q();
+    return new Q();
 };
 
 Cli.prototype.printDeviceList = function (nconf) {
@@ -74,6 +74,24 @@ Cli.prototype.printDeviceList = function (nconf) {
         console.log('Scenes:'.underline.bold);
         _(scenes).each(function (value, key) {
             console.log('  ' + key + ' (' + value + ')');
+        });
+    });
+};
+
+Cli.prototype.printSchedulePreview = function () {
+    return this.app.previewSchedule().then(function (preview) {
+        console.log(preview.title.green.bold.underline, '\n');
+        _(preview.events).each(function (e) {
+            console.log(e.date.bold.underline);
+            if (e.scenes.length) {
+                console.log('  Scenes:');
+                console.log('    ' + e.scenes);
+            }
+            if (e.devices.length) {
+                console.log('  Devices:');
+                console.log('    ' + e.devices);
+            }
+            console.log('');
         });
     });
 };

@@ -49,6 +49,14 @@ router.get('/devices', function (req, res) {
     });
 });
 
+router.get('/schedule', function (req, res) {
+    app.previewSchedule().then(function (preview) {
+        res.send(preview);
+    }, function (err) {
+        _sendError(res, err);
+    });
+});
+
 router.post('/devices/:deviceId/:newState', function (req, res) {
     var deviceId = req.params.deviceId;
     var newState = req.params.newState;
