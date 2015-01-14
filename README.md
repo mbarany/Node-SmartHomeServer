@@ -21,6 +21,7 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 # Setup
 - Copy `config/config.sample.js` to `config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
+- Copy `config/schedule.sample.js` to `config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
 - Run the Install/Update script `./bin/update`
 - Run `node index.js --help` for usage
 - Run `./bin/start` to start the server with forever

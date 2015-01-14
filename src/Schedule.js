@@ -4,7 +4,6 @@ var _ = require('underscore');
 var later = require('later');
 var SunCalc = require('suncalc');
 var moment = require('moment-timezone');
-require('colors');
 
 
 var Schedule = function (controller, scenes, rawSchedule, location) {

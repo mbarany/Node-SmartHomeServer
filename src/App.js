@@ -1,15 +1,15 @@
 'use strict';
 
-var _ = require("underscore");
+var _ = require('underscore');
 var later = require('later');
 var Q = require('q');
 var Pushbullet = require('pushbullet');
 
 var log = require('./log').prefix('App');
 var errors = require('./errors');
-var VeraApi = require("./vera/Api");
+var VeraApi = require('./vera/Api');
 var VeraController = require('./vera/Controller');
-var VeraScene = require("./vera/Scene");
+var VeraScene = require('./vera/Scene');
 var Schedule = require('./Schedule');
 var webServer = require('./web/server');
 
