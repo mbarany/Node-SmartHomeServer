@@ -99,6 +99,10 @@ function _setupSchedule() {
         throw new Error('Empty Schedule!');
     }
 
+    if (this._schedules.length) {
+        return;
+    }
+
     for (var i = 0; i < 7; i++) {
         _(schedule.weekly).each(function (w) {
             var daysToIterate = w.days && w.days.length ? w.days : ALL_DAYS;
@@ -145,9 +149,9 @@ function _setupTimers() {
     });
 }
 
-function _previewSchedule() {
+function _previewSchedule(page) {
     var _this = this;
-    var startOfWeek = this.getStartOfWeek();
+    var startOfWeek = this.getStartOfWeek(page);
     var scheduleStartDate = startOfWeek.toDate();
     var preview = {
         title: startOfWeek.year() + ' schedule for Week #' + startOfWeek.week(),
@@ -163,17 +167,19 @@ function _previewSchedule() {
             var deviceId = device[0];
             var state = device[1];
             var d = _getDevice.call(_this, deviceId);
-            return d.getName() + '(' + state + ')';
+            return d.getName() + ' (' + state + ')';
         });
         var nextDate = later.schedule(s.schedule).next(1, scheduleStartDate);
         var nextMoment = moment.tz(nextDate, _this.getTimezone());
 
         preview.events.push({
+            timestamp: nextMoment.unix(),
             date: nextMoment.format(DATE_FORMAT),
             scenes: scenes.length ? scenes.join(', ') : '',
             devices: devices.length ? devices.join(', ') : '',
         });
     });
+    preview.events = _.sortBy(preview.events, 'timestamp');
     return preview;
 }
 
@@ -201,13 +207,16 @@ Schedule.prototype.getTimezone = function () {
     return this.location.timezone || DEFAULT_TIMEZONE;
 };
 
-Schedule.prototype.getStartOfWeek = function () {
-    return moment().tz(this.getTimezone()).startOf('week');
+Schedule.prototype.getStartOfWeek = function (page) {
+    return moment()
+        .add(7 * (page - 1), 'days')
+        .tz(this.getTimezone())
+        .startOf('week');
 };
 
-Schedule.prototype.preview = function () {
+Schedule.prototype.preview = function (page) {
     _setupSchedule.call(this);
-    return _previewSchedule.call(this);
+    return _previewSchedule.call(this, page);
 };
 
 Schedule.prototype.run = function () {

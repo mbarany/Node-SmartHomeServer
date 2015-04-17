@@ -4,6 +4,7 @@ var express = require('express');
 var _ = require('underscore');
 var https = require('https');
 var fs = require('fs');
+var compression = require('compression');
 
 var log = require('../log').prefix('Api');
 
@@ -32,6 +33,8 @@ function createServer (rootApp, apiConfig) {
     }
 
     server.set('x-powered-by', false);
+
+    server.use(compression());
 
     server.use('/api', require('./routes/api')(rootApp, apiConfig));
 

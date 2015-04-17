@@ -45,7 +45,7 @@ Basic Authentication is used to authenticate API calls. Simply pass a valid pre-
 
 Example API Call:
 ```
-curl -u "{accessToken}:" http://{ip-address}:{port}/api/devices
+curl -u "{accessToken}:" http(s)://{host}:{port}/api/devices
 
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -99,7 +99,7 @@ Returns an the schedule for the current week
 License
 =======
 
-    Copyright 2014 Michael Barany
+    Copyright 2014-2015 Michael Barany
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

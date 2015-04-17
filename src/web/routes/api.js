@@ -3,6 +3,7 @@
 var router = require('express').Router();
 var auth = require('basic-auth');
 var _ = require('underscore');
+var Q = require('q');
 
 var log = require('../../log').prefix('Api');
 var errors = require('../../errors');
@@ -29,6 +30,24 @@ function _sendError(res, err) {
     res.send({ error: err.message });
 }
 
+function _validateVariable (variable) {
+    var validationFunctions = [].slice.call(arguments, 1);
+
+    return Q.fcall(function () {
+        var isValid = _(validationFunctions).every(function (func) {
+            return func(variable);
+        });
+        if (!isValid) {
+            throw new errors.ClientError('Not valid!');
+        }
+        return variable;
+    });
+}
+
+function _isPositiveNumber (number) {
+    return _.isFinite(number) && Number(number) > 0;
+}
+
 router.use(function(req, res, next) {
     var user = auth(req);
 
@@ -50,7 +69,9 @@ router.get('/devices', function (req, res) {
 });
 
 router.get('/schedule', function (req, res) {
-    app.previewSchedule().then(function (preview) {
+    _validateVariable(req.query.page, _isPositiveNumber).then(function (page) {
+        return app.previewSchedule(page);
+    }).then(function (preview) {
         res.send(preview);
     }, function (err) {
         _sendError(res, err);

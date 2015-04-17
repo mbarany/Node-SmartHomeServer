@@ -85,6 +85,9 @@ function _loadDevices() {
                     _this.deviceData = devices;
                     log('Writing deviceData to cache...');
                     _this.cache.set(CACHE_DEVICES, _this.deviceData);
+                }, function () {
+                    log('Api Failure! Trying to use stale cache...');
+                    return _this.cache.get(CACHE_DEVICES);
                 });
         })
         .then(function () {
