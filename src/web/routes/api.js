@@ -69,7 +69,8 @@ router.get('/devices', function (req, res) {
 });
 
 router.get('/schedule', function (req, res) {
-    _validateVariable(req.query.page, _isPositiveNumber).then(function (page) {
+    var page = req.query.page || 1;
+    _validateVariable(page, _isPositiveNumber).then(function (page) {
         return app.previewSchedule(page);
     }).then(function (preview) {
         res.send(preview);

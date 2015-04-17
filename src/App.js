@@ -91,9 +91,8 @@ App.prototype.startServer = function () {
     });
 };
 
-App.prototype.previewSchedule = function (_page) {
+App.prototype.previewSchedule = function (page) {
     var _this = this;
-    var page = _page || 1;
 
     return this.controller.load().then(function () {
         return _this.schedule.preview(page);
