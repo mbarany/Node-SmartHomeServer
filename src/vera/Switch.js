@@ -30,6 +30,11 @@ var Switch = AbstractDevice.extend({
         return this.status ? 'On' : 'Off';
     },
 
+    hasStatus: function (state) {
+        var status = state === 'on' ? 1 : 0;
+        return this.status === status;
+    },
+
     setStateNumber: function (value) {
         throw new Error('Invalid state for value "' + value + '"!');
     },
@@ -41,7 +46,8 @@ var Switch = AbstractDevice.extend({
         });
 
         if (state.length) {
-            this.status = parseInt(state[0].value, 10);
+            var newStatus = parseInt(state[0].value, 10);
+            this.setStatus(newStatus);
         }
     },
 

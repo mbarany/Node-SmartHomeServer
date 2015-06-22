@@ -26,10 +26,6 @@ var DimmableSwitch = AbstractDevice.extend({
         return this.dim(0);
     },
 
-    getStatus: function () {
-        return this.status ? this.status + '% On' : 'Off';
-    },
-
     setStateNumber: function (value) {
         return this.dim(value);
     },
@@ -43,6 +39,18 @@ var DimmableSwitch = AbstractDevice.extend({
         return this._action(SERVICES.DIMMER, value);
     },
 
+    getStatus: function () {
+        return this.status ? this.status + '% On' : 'Off';
+    },
+
+    hasStatus: function (state) {
+        if (_.isNumber(state)) {
+            return this.status === state;
+        }
+        var status = state === 'on' ? 100 : 0;
+        return this.status === status;
+    },
+
     parseStates: function (states) {
         var state = _(states).where({
             service: SERVICES.DIMMER.serviceId,
@@ -50,7 +58,8 @@ var DimmableSwitch = AbstractDevice.extend({
         });
 
         if (state.length) {
-            this.status = parseInt(state[0].value, 10);
+            var newStatus = parseInt(state[0].value, 10);
+            this.setStatus(newStatus);
         }
     },
 

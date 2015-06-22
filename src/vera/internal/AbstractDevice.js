@@ -5,8 +5,9 @@ var _ = require('underscore');
 var ApiService = require('./ApiService');
 
 
-var AbstractDevice = function (api, deviceData) {
+var AbstractDevice = function (api, deviceData, bus) {
     this.api = api;
+    this.bus = bus;
     this.deviceId = deviceData.id;
     this.deviceName = deviceData.name;
     this.parseStates(deviceData.states);
@@ -51,6 +52,23 @@ AbstractDevice.prototype.getName = function () {
 
 AbstractDevice.prototype.getStatus = function () {
     throw new Error('getStatus not implemented!');
+};
+
+AbstractDevice.prototype.setStatus = function (newStatus) {
+    var oldStatus = _.isObject(this.status) ? _.extend({}, this.status) : this.status;
+
+    if (_.isEqual(oldStatus, newStatus)) {
+        return;
+    }
+    this.status = newStatus;
+    this.bus.emit(['device', 'change', this.getId()], {
+        oldStatus: oldStatus,
+        newStatus: newStatus
+    });
+};
+
+AbstractDevice.prototype.hasStatus = function () {
+    throw new Error('hasStatus not implemented!');
 };
 
 AbstractDevice.prototype.setState = function (state) {

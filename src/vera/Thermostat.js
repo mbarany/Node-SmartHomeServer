@@ -47,6 +47,13 @@ var Thermostat = AbstractDevice.extend({
         return 'Off';
     },
 
+    hasStatus: function (state) {
+        if (_.isNumber(state)) {
+            return this.status.temperature === state;
+        }
+        return this.status.mode.toLowerCase() === state.toLowerCase();
+    },
+
     off: function () {
         return this._action(SERVICES.MODE, 'Off');
     },
@@ -68,13 +75,15 @@ var Thermostat = AbstractDevice.extend({
             service: SERVICES.TEMPERATURE.serviceId,
             variable: 'CurrentSetpoint'
         });
+        var newStatus = _.extend({}, this.status);
 
         if (stateMode.length) {
-            this.status.mode = stateMode[0].value;
+            newStatus.mode = stateMode[0].value;
         }
         if (stateTemperature.length) {
-            this.status.temperature = parseInt(stateTemperature[0].value, 10);
+            newStatus.temperature = parseInt(stateTemperature[0].value, 10);
         }
+        this.setStatus(newStatus);
     },
 
 });

@@ -1,6 +1,7 @@
 'use strict';
 
-var _ = require("underscore");
+var _ = require('underscore');
+var EventEmitter2 = require('eventemitter2').EventEmitter2;
 
 var log = require('../log').prefix('Controller');
 var Switch = require('./Switch');
@@ -16,6 +17,12 @@ var Controller = function (api, cache) {
     this.deviceData = [];
     this.devices = {};
     this.remoteUrlSession = '';
+    this.bus = new EventEmitter2({
+        wildcard: true,
+        delimiter: '::',
+        newListener: false
+    });
+
     return this;
 };
 
@@ -65,8 +72,8 @@ function _createDeviceInstances() {
     var _this = this;
 
     _(this.deviceData).each(function (device) {
-        var Clazz = _getDeviceClass.call(this, device.deviceType);
-        _this.devices[device.id] = new Clazz(_this.api, device);
+        var ClassName = _getDeviceClass.call(this, device.deviceType);
+        _this.devices[device.id] = new ClassName(_this.api, device, _this.bus);
     });
 }
 
@@ -135,6 +142,10 @@ Controller.prototype.getCategorizedDevices = function () {
     return this.load().then(function () {
         return _getCategorizedDevices.call(_this);
     });
+};
+
+Controller.prototype.getBus = function () {
+    return this.bus;
 };
 
 module.exports = Controller;
