@@ -3,9 +3,33 @@
 var _ = require('underscore');
 var moment = require('moment-timezone');
 
+var nconf = require('../config');
+
+
+var LEVEL = {
+    OFF: 'off',
+    INFO: 'info',
+    DEBUG: 'debug'
+};
+var BUCKETS = {};
+BUCKETS[LEVEL.DEBUG] = ['VeraApi'];
+var logLevel = nconf.get('log:level') || LEVEL.OFF;
 
 function _getFormattedDate() {
     return '[' + moment().format('llll') + ']';
+}
+
+function _shouldMuteLogLine(prefix) {
+    switch (logLevel) {
+        case LEVEL.INFO:
+            // Everything that is not labeled debug
+            return _(BUCKETS[LEVEL.DEBUG]).contains(prefix);
+        case LEVEL.DEBUG:
+            return true;
+        case LEVEL.OFF:
+        default:
+            return false;
+    }
 }
 
 function log() {
@@ -13,6 +37,8 @@ function log() {
     args.push.apply(args, arguments);
     console.log.apply(console, args);
 }
+
+log.LEVEL = LEVEL;
 
 log.line = function (line, isStartOfLine) {
     if (isStartOfLine) {
@@ -24,11 +50,17 @@ log.line = function (line, isStartOfLine) {
 log.prefix = function (prefix) {
     var logPrefix = function () {
         var args = ['[' + prefix + ']'];
+        if (_shouldMuteLogLine(prefix)) {
+            return;
+        }
         args.push.apply(args, arguments);
         log.apply(log, args);
     };
 
     logPrefix.line = function (line, isStartOfLine) {
+        if (_shouldMuteLogLine(prefix)) {
+            return;
+        }
         if (isStartOfLine) {
             line = '[' + prefix + '] ' + line;
         }

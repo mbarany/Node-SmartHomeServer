@@ -8,6 +8,9 @@ module.exports = {
     "crontab": {
         "user": "root"
     },
+    "log": {
+        "level": "info"
+    },
     "pushbullet": {},
     "api": {
         "accessTokens": [],
