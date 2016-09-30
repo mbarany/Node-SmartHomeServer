@@ -1,6 +1,6 @@
 {
-  "name": "Node-VeraSmartHomeServer",
-  "version": "0.0.1",
+  "name": "vera-smarthome-server",
+  "version": "1.0.0",
   "description": "Node-VeraSmartHomeServer",
   "main": "index.js",
   "private": true,
@@ -12,15 +12,15 @@
     "eventemitter2": "^0.4.14",
     "express": "^4.10.2",
     "extend-error": "0.0.2",
-    "jsonfile": "^2.0.0",
-    "later": "^1.1.6",
+    "jsonfile": "^2.4.0",
+    "later": "^1.2.0",
     "moment-timezone": "^0.2.4",
-    "nconf": "^0.7.1",
+    "nconf": "^0.7.2",
     "pushbullet": "^1.4.2",
     "q": "^1.1.1",
     "q-io": "^1.11.5",
     "suncalc": "^1.6.0",
-    "underscore": "^1.7.0"
+    "underscore": "^1.8.0"
   },
   "devDependencies": {
     "jshint": "^2.5.10"
@@ -29,13 +29,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Michael Barany",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mbarany/Node-VeraSmartHomeServer.git"
+    "url": "git+https://github.com/mbarany/Node-VeraSmartHomeServer.git"
   },
   "bugs": {
     "url": "https://github.com/mbarany/Node-VeraSmartHomeServer/issues"
   },
-  "homepage": "https://github.com/mbarany/Node-VeraSmartHomeServer"
+  "homepage": "https://github.com/mbarany/Node-VeraSmartHomeServer",
+  "bin": {
+    "vera-smarthome-server": "dist.js"
+  }
 }
