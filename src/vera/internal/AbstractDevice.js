@@ -30,7 +30,7 @@ AbstractDevice.extend = function (subPrototype) {
 };
 
 AbstractDevice.prototype._action = function (service, actionValue) {
-    if (!service instanceof ApiService) {
+    if (!(service instanceof ApiService)) {
         throw new Error('Invalid ApiService!');
     }
     var data = {

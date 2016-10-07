@@ -1,4 +1,4 @@
-# Node-VeraSmartHomeServer
+# Node-SmartHomeServer
 A small Node Server to interact with the Vera Smart Home system (http://getvera.com/).
 
 ## Features:
@@ -16,15 +16,14 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 # Global Dependencies
 - node/npm http://nodejs.org/
-- forever `[sudo] npm install forever -g`
 
 
 # Setup
 - Copy `config/config.sample.js` to `config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
 - Copy `config/schedule.sample.js` to `config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
 - Run the Install/Update script `./bin/update`
-- Run `node index.js --help` for usage
-- Run `./bin/start` to start the server with forever
+- Run `node . --help` for usage
+- Run `npm run server` to start the server with forever
 
 
 # Updating
@@ -32,11 +31,11 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 
 # Usage
-- Start the schedule and API Server: `node index.js --server`
-- List all available devices: `node index.js --list`
-- Preview the current schedule: `node index.js --preview`
-- Change the state of a device: `node index.js [deviceId] [state]`
-- Execute a scene: `node index.js [sceneId]`
+- Start the schedule and API Server: `node . --server`
+- List all available devices: `node . --list`
+- Preview the current schedule: `node . --preview`
+- Change the state of a device: `node . [deviceId] [state]`
+- Execute a scene: `node . [sceneId]`
 
 
 # API

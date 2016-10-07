@@ -26,8 +26,8 @@ function _shouldMuteLogLine(prefix) {
             return _(BUCKETS[LEVEL.DEBUG]).contains(prefix);
         case LEVEL.DEBUG:
             return true;
-        case LEVEL.OFF:
         default:
+        case LEVEL.OFF:
             return false;
     }
 }
