@@ -210,7 +210,7 @@ Api.prototype.userData = function () {
 Api.prototype.status = function (params) {
     var _this = this;
     var allParams = _.extend({}, {
-        id: 'status'
+        id: 'lu_status'
     }, params);
 
     return _doRequest.call(_this, allParams);

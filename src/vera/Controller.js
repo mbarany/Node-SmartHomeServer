@@ -131,8 +131,41 @@ function _getCategorizedDevices() {
     return categorizedDevices;
 }
 
+function _startVeraEventListener () {
+    _getStatus.call(this);
+}
+
+function _getStatus() {
+    var _this = this;
+    var params = {
+        MinimumDelay: 1000,
+        Timeout: 120,
+        DataVersion: this._DataVersion || 0,
+        LoadTime: this._LoadTime || 0,
+    };
+
+    this.api.status(params).then(function (res) {
+        _this._DataVersion = res.DataVersion;
+        _this._LoadTime = res.LoadTime;
+
+        _(res.devices).each(function (d) {
+            if (!d.states) {
+                return;
+            }
+            _this.devices[d.id].parseStates(d.states);
+        });
+    }).fin(function () {
+        _getStatus.call(_this);
+    });
+}
+
 Controller.prototype.load = function () {
-    return _loadDevices.call(this);
+    var _this = this;
+
+    return _loadDevices.call(this).then(function () {
+        log('Starting Vera event listener...');
+        _startVeraEventListener.call(_this);
+    });
 };
 
 Controller.prototype.getCategorizedDevices = function () {

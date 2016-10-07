@@ -5,6 +5,8 @@ var later = require('later');
 var SunCalc = require('suncalc');
 var moment = require('moment-timezone');
 
+var log = require('./log').prefix('Schedule');
+
 
 var Schedule = function (controller, scenes, rawSchedule, location) {
     this.controller = controller;
@@ -141,9 +143,32 @@ function _setupTimers() {
                     throw new Error('Invalid device configuration!');
                 }
                 var deviceId = device[0];
-                var state = device[1];
                 var d = _getDevice.call(_this, deviceId);
-                d.setState(state);
+                var stateObj = _.isObject(device[1]) ? device[1] : { state: device[1] };
+                var ensureFor = stateObj.ensureFor;
+
+                d.setState(stateObj.state);
+
+                if (!ensureFor) {
+                    return;
+                }
+
+                var millis = ensureFor * 60 * 1000;
+                var callback = function (data) {
+                    if (d.hasStatus(stateObj.state)) {
+                        return;
+                    }
+                    setTimeout(function () {
+                        log('Ensuring State for id: ' + d.getId());
+                        d.setState(stateObj.state);
+                    }, 4000);
+                };
+                log('Start ensuring for id: ' + d.getId());
+                _this.controller.getBus().on(['device', 'change', deviceId], callback);
+                setTimeout(function () {
+                    log('Stop ensuring for id: ' + d.getId());
+                    _this.controller.getBus().off(['device', 'change', deviceId], callback);
+                }, millis);
             });
         }, s.schedule);
     });
