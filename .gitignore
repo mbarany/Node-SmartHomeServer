@@ -1,9 +1,16 @@
-node_modules
-config/config.js
-config/schedule.js
+# App Specific
+/node_modules/
+/config/config.js
+/config/schedule.js
+/cache/
+
+# Local
+/local/
+
+# IDE
+/.idea/
+
+# OS Specific
 .DS_Store
-.idea
-cache/*
-local/*
-dist/*
+
 !.gitkeep

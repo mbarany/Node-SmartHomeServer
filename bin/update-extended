@@ -1,14 +1,7 @@
 #!/bin/bash
 
-pushd `dirname $0` > /dev/null
-SCRIPTPATH=`pwd`
-popd > /dev/null
-
+# Install/Update Dependencies
 npm install --prod
-node $SCRIPTPATH/dist.js
 
-# Remove Old cronfile
-sudo rm -vf $/etc/cron.d/Node-VeraSmartHomeServer
-
-# Re-link cronfile (in case directory has moved, etc)
-sudo ln -svf $SCRIPTPATH/../dist/crontab /etc/cron.d/Node-SmartHomeServer
+# Remove Old cronfiles
+sudo rm -vf /etc/cron.d/Node-VeraSmartHomeServer /etc/cron.d/Node-SmartHomeServer

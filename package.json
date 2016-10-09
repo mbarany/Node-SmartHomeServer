@@ -1,14 +1,14 @@
 {
   "name": "smarthome-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Node-SmartHomeServer",
   "author": "Michael Barany",
   "license": "Apache-2.0",
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "server": "forever --watch --minUptime 5000 --spinSleepTime 2000 --watchDirectory ./ start ./index.js --server",
+    "install": "sudo forever-service install smarthome-server --script index.js -o ' --server' -f ' --watch' -e 'NODE_ENV=production' --minUptime 5000 --spinSleepTime 2000",
+    "uninstall": "sudo forever-service delete smarthome-server",
     "test": "jshint ."
   },
   "dependencies": {
@@ -19,7 +19,6 @@
     "eventemitter2": "^0.4.14",
     "express": "^4.10.2",
     "extend-error": "0.0.2",
-    "forever": "^0.15.2",
     "jsonfile": "^2.4.0",
     "later": "^1.2.0",
     "moment-timezone": "^0.5.5",

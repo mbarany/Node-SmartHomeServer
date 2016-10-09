@@ -16,14 +16,15 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 # Global Dependencies
 - node/npm http://nodejs.org/
+- forever and forever-service `sudo npm install -f forever forever-service`
 
 
 # Setup
-- Copy `config/config.sample.js` to `config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
-- Copy `config/schedule.sample.js` to `config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
+- `cp config/config.sample.js config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
+- `cp config/schedule.sample.js config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
 - Run the Install/Update script `./bin/update`
-- Run `node . --help` for usage
-- Run `npm run server` to start the server with forever
+- Install the service `npm run install`
+- Run `sudo service smarthome-server start` to start the server
 
 
 # Updating
@@ -31,7 +32,7 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 
 # Usage
-- Start the schedule and API Server: `node . --server`
+- Start/Stop the schedule and API Server: `sudo service smarthome-server start` / `sudo service smarthome-server stop`
 - List all available devices: `node . --list`
 - Preview the current schedule: `node . --preview`
 - Change the state of a device: `node . [deviceId] [state]`
@@ -98,7 +99,7 @@ Returns an the schedule for the current week
 License
 =======
 
-    Copyright 2014-2015 Michael Barany
+    Copyright 2014-2016 Michael Barany
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
