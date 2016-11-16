@@ -23,7 +23,7 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 - `cp config/config.sample.js config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
 - `cp config/schedule.sample.js config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
 - Run the Install/Update script `./bin/update`
-- Install the service `npm run install`
+- Install the service `npm run install-service`
 - Run `sudo service smarthome-server start` to start the server
 
 

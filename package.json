@@ -7,8 +7,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "install": "sudo forever-service install smarthome-server --script index.js -o ' --server' -f ' --watch' -e 'NODE_ENV=production' --minUptime 5000 --spinSleepTime 2000",
-    "uninstall": "sudo forever-service delete smarthome-server",
+    "install-service": "sudo forever-service install smarthome-server --script index.js -o ' --server' -f ' --watch' -e 'NODE_ENV=production' --minUptime 5000 --spinSleepTime 2000",
+    "uninstall-service": "sudo forever-service delete smarthome-server",
     "test": "jshint ."
   },
   "dependencies": {
