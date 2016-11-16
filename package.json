@@ -21,7 +21,7 @@
     "extend-error": "0.0.2",
     "jsonfile": "^2.4.0",
     "later": "^1.2.0",
-    "moment-timezone": "^0.5.5",
+    "moment-timezone": "^0.5.9",
     "nconf": "^0.8.4",
     "pushbullet": "^1.4.2",
     "q": "^1.1.1",
