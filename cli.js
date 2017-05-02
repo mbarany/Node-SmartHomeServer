@@ -1,9 +1,12 @@
+#! /usr/bin/env node
+
 require('babel-register')({
-    "presets": ["es2015", "react"]
+    "presets": ["es2015"]
 });
 
 const log = require('debug')('App:Boot');
 const JsonCache = require('./src/JsonCache');
+const Cli = require('./src/Cli');
 const App = require('./src/App');
 const nconf = require('./config');
 
@@ -13,7 +16,8 @@ const cache = new JsonCache(`${appDir}cache/`);
 const app = new App(nconf, appDir, cache);
 
 app.load().then(() => {
-    return app.startServer();
+    const cli = new Cli(app);
+    return cli.execute(nconf);
 }).fail(err => {
     log(err);
 });

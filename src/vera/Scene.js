@@ -1,11 +1,23 @@
-'use strict';
+class Scene {
+    constructor(api, sceneId, sceneName) {
+        this.api = api;
+        this.sceneId = sceneId;
+        this.sceneName = sceneName;
+        return this;
+    }
 
-var Scene = function (api, sceneId, sceneName) {
-    this.api = api;
-    this.sceneId = sceneId;
-    this.sceneName = sceneName;
-    return this;
-};
+    getId() {
+        return this.sceneId;
+    }
+
+    getName() {
+        return this.sceneName;
+    }
+
+    run() {
+        return _action.call(this);
+    }
+}
 
 function _action() {
     return this.api.action({
@@ -14,16 +26,4 @@ function _action() {
     }, 'RunScene');
 }
 
-Scene.prototype.getId = function () {
-    return this.sceneId;
-};
-
-Scene.prototype.getName = function () {
-    return this.sceneName;
-};
-
-Scene.prototype.run = function () {
-    return _action.call(this);
-};
-
-module.exports = Scene;
+export default Scene;

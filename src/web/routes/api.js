@@ -4,8 +4,8 @@ var router = require('express').Router();
 var auth = require('basic-auth');
 var _ = require('underscore');
 var Q = require('q');
+var log = require('debug')('App:Api');
 
-var log = require('../../log').prefix('Api');
 var errors = require('../../errors');
 
 
@@ -52,7 +52,7 @@ router.use(function(req, res, next) {
     var user = auth(req);
 
     if (_validateUser(user)) {
-        log(req.method, req.url);
+        log(req.method + ' ' + req.url);
         next();
     } else {
         res.sendStatus(401);

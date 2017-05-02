@@ -1,22 +1,22 @@
 'use strict';
 
-var express = require('express');
-var _ = require('underscore');
-var https = require('https');
-var fs = require('fs');
-var compression = require('compression');
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import compression from 'compression';
+import Express from 'express';
 
-var log = require('../log').prefix('Api');
-
+const log = require('debug')('App:Api');
 
 function getSslOptions(rootApp, apiConfig) {
-    var options = {
+    const caBundle = apiConfig.caBundle || [];
+    const options = {
         key: fs.readFileSync(rootApp.appDir + apiConfig.key),
         cert: fs.readFileSync(rootApp.appDir + apiConfig.cert),
         ca: []
     };
 
-    _(apiConfig.caBundle).each(function (ca) {
+    caBundle.forEach(function (ca) {
         options.ca.push(fs.readFileSync(rootApp.appDir + ca));
     });
 
@@ -24,39 +24,49 @@ function getSslOptions(rootApp, apiConfig) {
 }
 
 function createServer (rootApp, apiConfig) {
-    var port = apiConfig.port;
-    var server = express();
-    var secureServer;
+    const port = apiConfig.port;
+    const expressApp = new Express();
 
-    if (apiConfig.isSecure) {
-        secureServer = https.createServer(getSslOptions(rootApp, apiConfig), server);
-    }
+    expressApp.set('view engine', 'ejs');
+    expressApp.set('views', './web/views');
 
-    server.set('x-powered-by', false);
+    expressApp.set('x-powered-by', false);
 
-    server.use(compression());
+    expressApp.use(compression());
 
-    server.use('/api', require('./routes/api')(rootApp, apiConfig));
-
-    server.get('/', function (req, res) {
-        res.send('Nothing to see here.');
+    expressApp.use(function (req, res, next) {
+        if (!apiConfig.isSecure || req.secure) {
+            return next();
+        };
+        res.redirect('https://' + req.get('host') + req.url);
     });
 
-    server.use(function(err, req, res, next){
+    // Static Files
+    expressApp.use(Express.static('./web/public'));
+
+    expressApp.use('/api', require('./routes/api')(rootApp, apiConfig));
+
+
+    expressApp.get('*', function (req, res) {
+        res.render('index');
+    });
+
+    expressApp.use(function(err, req, res, next){
         var msg = err.message || 'Error!';
 
         log(err.stack);
         res.status(500).send({ error: msg });
     });
 
-    if (secureServer) {
-        secureServer.listen(port);
+    let server;
+    if (apiConfig.isSecure) {
+        server = https.createServer(getSslOptions(rootApp, apiConfig), expressApp);
     } else {
-        server.listen(port);
+        server = http.createServer(expressApp);
     }
-    log.line('Listening on port ' + port + '...');
+    server.listen(port);
 
-    return server;
+    log('Listening' + (apiConfig.isSecure ? ' securely' : '') + ' on port ' + port + '...');
 }
 
 module.exports = createServer;

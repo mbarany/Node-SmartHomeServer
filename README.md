@@ -33,10 +33,13 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 # Usage
 - Start/Stop the schedule and API Server: `sudo service smarthome-server start` / `sudo service smarthome-server stop`
-- List all available devices: `node . --list`
-- Preview the current schedule: `node . --preview`
-- Change the state of a device: `node . [deviceId] [state]`
-- Execute a scene: `node . [sceneId]`
+
+
+# CLI
+- List all available devices: `smarthome-cli --list`
+- Preview the current schedule: `smarthome-cli --preview`
+- Change the state of a device: `smarthome-cli [deviceId] [state]`
+- Execute a scene: `smarthome-cli [sceneId]`
 
 
 # API

@@ -6,8 +6,7 @@ var fs = require('fs');
 var http = require("q-io/http");
 var https = require("https");
 var cheerio = require("cheerio");
-
-var log = require('../log').prefix('VeraApi');
+var log = require('debug')('App:VeraApi');
 
 
 var defaultParams = {
@@ -26,8 +25,8 @@ var CACHE_REMOTE_URL_SESSION = 'remote_url_session';
 function _wrapBadSSLChain(options) {
     var defaultOpts = {
         ca: [
-            fs.readFileSync(this.appDir + 'vera/certs/gd-class2-root.crt'),
-            fs.readFileSync(this.appDir + 'vera/certs/gd_intermediate.crt')
+            fs.readFileSync(this.appDir + 'resources/vera/certs/gd-class2-root.crt'),
+            fs.readFileSync(this.appDir + 'resources/vera/certs/gd_intermediate.crt')
         ]
     };
     var opts = _.extend({}, defaultOpts, options);

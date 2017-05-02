@@ -1,10 +1,10 @@
 require('extend-error');
 
 
-var ClientError = Error.extend('ClientError');
+const ClientError = Error.extend('ClientError');
 
-var errors = {
-    ClientError: ClientError,
+const errors = {
+    ClientError,
 };
 
-module.exports = errors;
+export default errors;

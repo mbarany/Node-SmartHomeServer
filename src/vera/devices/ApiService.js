@@ -1,6 +1,4 @@
-'use strict';
-
-var ApiService = function () {
+const ApiService = function () {
     if (arguments.length !== 3) {
         throw new Error('ApiService constructor requires 3 arguments!');
     }
@@ -9,4 +7,4 @@ var ApiService = function () {
     this.value = arguments[2];
 };
 
-module.exports = ApiService;
+export default ApiService;
