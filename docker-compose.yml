@@ -1,0 +1,15 @@
+version: "2"
+
+services:
+  smarthome-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    network_mode: bridge
+    restart: always
+    ports:
+      - "8080"
+    volumes:
+      - ./config:/opt/app/config:ro
+    environment:
+      - NODE_ENV=dev

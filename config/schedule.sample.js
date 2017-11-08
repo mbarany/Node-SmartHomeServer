@@ -1,3 +1,5 @@
+// Rename to schedule.js and modify to your liking
+
 var switches = { //This is the device id in the Vera system
     living_room: 6,
     dining_room: 7,

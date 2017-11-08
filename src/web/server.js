@@ -1,27 +1,8 @@
-'use strict';
-
-import fs from 'fs';
 import http from 'http';
-import https from 'https';
 import compression from 'compression';
 import Express from 'express';
 
 const log = require('debug')('App:Api');
-
-function getSslOptions(rootApp, apiConfig) {
-    const caBundle = apiConfig.caBundle || [];
-    const options = {
-        key: fs.readFileSync(rootApp.appDir + apiConfig.key),
-        cert: fs.readFileSync(rootApp.appDir + apiConfig.cert),
-        ca: []
-    };
-
-    caBundle.forEach(function (ca) {
-        options.ca.push(fs.readFileSync(rootApp.appDir + ca));
-    });
-
-    return options;
-}
 
 function createServer (rootApp, apiConfig) {
     const port = apiConfig.port;
@@ -35,7 +16,7 @@ function createServer (rootApp, apiConfig) {
     expressApp.use(compression());
 
     expressApp.use(function (req, res, next) {
-        if (!apiConfig.isSecure || req.secure) {
+        if (!apiConfig.forceHttps || req.secure) {
             return next();
         };
         res.redirect('https://' + req.get('host') + req.url);
@@ -46,9 +27,12 @@ function createServer (rootApp, apiConfig) {
 
     expressApp.use('/api', require('./routes/api')(rootApp, apiConfig));
 
+    expressApp.get('/', function (req, res) {
+        res.render('index');
+    });
 
     expressApp.get('*', function (req, res) {
-        res.render('index');
+        res.render('errors/404');
     });
 
     expressApp.use(function(err, req, res, next){
@@ -58,15 +42,11 @@ function createServer (rootApp, apiConfig) {
         res.status(500).send({ error: msg });
     });
 
-    let server;
-    if (apiConfig.isSecure) {
-        server = https.createServer(getSslOptions(rootApp, apiConfig), expressApp);
-    } else {
-        server = http.createServer(expressApp);
-    }
+    const server = http.createServer(expressApp);
+
     server.listen(port);
 
-    log('Listening' + (apiConfig.isSecure ? ' securely' : '') + ' on port ' + port + '...');
+    log(`Listening on port ${port} ...`);
 }
 
 module.exports = createServer;

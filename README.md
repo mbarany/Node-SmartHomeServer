@@ -15,24 +15,14 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 
 # Global Dependencies
-- node/npm http://nodejs.org/
-- forever and forever-service `sudo npm install -f forever forever-service`
+- [Docker](https://www.docker.com/get-docker)
+- [Docker Compose](https://docs.docker.com/compose/install/) (Optional)
 
 
 # Setup
 - `cp config/config.sample.js config/config.js` and modify accordingly. See comments in [Sample config](config/config.sample.js) for more details.
 - `cp config/schedule.sample.js config/schedule.js` and modify accordingly. See comments in [Sample schedule](config/schedule.sample.js) for more details.
-- Run the Install/Update script `./bin/update`
-- Install the service `npm run install-service`
-- Run `sudo service smarthome-server start` to start the server
-
-
-# Updating
-- Convenient update script that pulls in remote changes and installs any new dependencies `./bin/update`
-
-
-# Usage
-- Start/Stop the schedule and API Server: `sudo service smarthome-server start` / `sudo service smarthome-server stop`
+- `docker-compose up -d`
 
 
 # CLI
@@ -43,7 +33,7 @@ A small Node Server to interact with the Vera Smart Home system (http://getvera.
 
 
 # API
-Set the port in `api.port` section of the config.
+Set the port in `api.port` section of the config. The default is **8080** which is also exposed in the docker container.
 Basic Authentication is used to authenticate API calls. Simply pass a valid pre-shared key that you have placed in the `api.accessTokens` section of the config as the username portion and leave the password blank.
 
 Example API Call:
@@ -102,7 +92,7 @@ Returns an the schedule for the current week
 License
 =======
 
-    Copyright 2014-2016 Michael Barany
+    Copyright 2014-2017 Michael Barany
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

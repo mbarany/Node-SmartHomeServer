@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# Install/Update Dependencies
-npm install --prod
-
-# Remove Old cronfiles
-sudo rm -vf /etc/cron.d/Node-VeraSmartHomeServer /etc/cron.d/Node-SmartHomeServer

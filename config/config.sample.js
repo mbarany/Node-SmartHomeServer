@@ -1,3 +1,5 @@
+// Rename to config.js and modify to your liking
+
 module.exports = {
     vera: {
         api: {
@@ -18,7 +20,7 @@ module.exports = {
         ],
         port: 443,
         // The following options are optional for SSL protection
-        isSecure: true,
+        forceHttps: true,
         key: 'local/server.key',
         cert: 'local/server.cert',
         // A CA bundle usually contains multiple certificate.

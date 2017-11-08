@@ -7,10 +7,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "install-service": "sudo forever-service install smarthome-server --script index.js -o ' --server' -f ' --watch' -e 'NODE_ENV=production' --minUptime 5000 --spinSleepTime 2000",
-    "uninstall-service": "sudo forever-service delete smarthome-server",
-    "test": "jshint .",
-    "dev": "webpack -d --watch"
+    "dev": "webpack -d --watch",
+    "start": "node index.js --server",
+    "test": "jshint ."
   },
   "bin": {
     "smarthome-cli": "cli.js"
@@ -18,7 +17,7 @@
   "dependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
-    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.16.0",
     "basic-auth": "^1.0.0",
     "bootstrap": "^3.3.7",
@@ -50,7 +49,6 @@
     "webpack": "^1.13.3"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.18.0",
     "babel-register": "^6.18.0",
     "babel-root-import": "^4.1.5",
     "jshint": "^2.5.10"

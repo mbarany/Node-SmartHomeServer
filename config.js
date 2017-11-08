@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var nconf = require('nconf');
-var defaultConfig = require('./config/config.defaults');
+var defaultConfig = require('./src/config.defaults');
 var userConfig = require('./config/config');
 var userSchedule = require('./config/schedule');
 

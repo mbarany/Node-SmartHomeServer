@@ -14,8 +14,8 @@ module.exports = {
     "pushbullet": {},
     "api": {
         "accessTokens": [],
-        "port": 80,
-        "isSecure": false
+        "port": 8080,
+        "forceHttps": false
     },
     "location": {}
 };
